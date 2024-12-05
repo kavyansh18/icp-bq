@@ -1,9 +1,11 @@
 # BQ Labs Insurance Contracts
 
 # Insurance Pool
+
 ### createPool
+
 ```
-    poolId 
+    poolId
     riskType - could be slashing, smart contract, protocol
     poolName
     apy
@@ -14,8 +16,10 @@
     asset - the address of the asset if it is an ERC 20 deposit type
 ```
 
-### getPool: 
+### getPool:
+
 Takes the `id` of the pool and returns a `Pool`:
+
 ```
 struct Pool {
     uint256 id;
@@ -36,11 +40,14 @@ struct Pool {
 }
 ```
 
-### getAllPools: 
+### getAllPools:
+
 Returns an array of `Pool`
 
 ### getPoolCovers:
+
 Gets the covers associated with a specific pool. Takes the pool `id` and returns an array of `Cover`:
+
 ```
 struct Cover {
     uint256 id;
@@ -58,7 +65,9 @@ struct Cover {
 ```
 
 ### getPoolsByAddress
+
 Gets the pools for a users by taking the `user address` and returns an an array of the user `PoolInfo`:
+
 ```
 struct PoolInfo {
     string poolName;
@@ -75,13 +84,17 @@ struct PoolInfo {
 ```
 
 ### poolWithdraw:
+
 Called by users to withdraw their funds deposited into a pool. Takes the `poolid` as parameter
 
 ### vaultWithdraw:
+
 Called by users to withdraw their funds deposited into a vault. Takes the `vaultid` as parameter
 
 ### deposit
+
 Called by users to deposit funds into a pool. Takes a `DepositParam` as parameter:
+
 ```
 struct DepositParams {
     address depositor;
@@ -95,10 +108,13 @@ struct DepositParams {
 ```
 
 ### claimProposalFunds
+
 Called by users to claim their funds from an approved proposal. Takes the `proposalid` as parameter
 
 ### getUserDeposit
+
 Gets the deposit for a users into a pool by taking the `poolid` and the `user address` and return the user `Deposit`
+
 ```
 struct Deposits {
     address lp;
@@ -115,9 +131,11 @@ struct Deposits {
 ```
 
 # Vaults
+
 ### createVault
+
 ```
-    vaultname 
+    vaultname
     poolIds - the ids of the pools that would be added to the vault
     poolPercentageSplit -  the percentage split of the pools. Must be the same number with the pools and the sum must be = 100
     minIv - vault min investment accepted
@@ -128,10 +146,13 @@ struct Deposits {
 ```
 
 ### vaultDeposit
+
 Called by users to deposit funds into a vault. Takes the `vaultId`, the `period` for deposit and the `amount`. It is also a `payable` function, so if the `adt` is native the `amount` would be `0` and the `msg.value` would be used, if otherwise the `amount` must be more than 0 and the vault's `asset` is accepted as deposit for the user.
 
 ### getVault
+
 Takes the `id` of the vault and returns a `Vault`:
+
 ```
 struct Vault {
     uint256 id;
@@ -146,7 +167,9 @@ struct Vault {
 ```
 
 ### getVaultPools
+
 Gets the pools associated with a specific vault. Takes the `vaultid` and returns an array of `Pool`:
+
 ```
 struct Pool {
     uint256 id;
@@ -168,7 +191,9 @@ struct Pool {
 ```
 
 ### getUserVaultPoolDeposits
+
 Gets the users individual pool deposits in a vault taking the `vaultid` and the `user address` and return an array of the user individual `Deposit`
+
 ```
 struct Deposits {
     address lp;
@@ -185,7 +210,9 @@ struct Deposits {
 ```
 
 ### getUserVaultPoolDeposit
+
 Gets the users vault deposit by taking the `vaultid` and the `user address` and returning the user `VaultDeposit`
+
 ```
 struct VaultDeposit {
     address lp;
@@ -199,3 +226,13 @@ struct VaultDeposit {
     uint256 accruedPayout;
 }
 ```
+
+# Contract Address
+
+**BQ BTC Address**: 0x037CEa0bFC93C957Bd94DB605247492d055AF13c
+
+**Pool Address**: 0xcBfc8e3dDcF6e90bA937eE6D7F8377945fb40322
+
+**Cover Address**: 0x5C87d071e9D71b4D9acF98fDc20D57e737F4d32F
+
+**Vault Address**: 0x2cB4Aca3D617A07506E7894adB0bE2b5360a15Bd
