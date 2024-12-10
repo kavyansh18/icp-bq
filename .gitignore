@@ -1,17 +1,39 @@
+# Various IDEs and Editors
+.vscode/
+.idea/
+**/*~
+
+# Mac OSX temporary files
+.DS_Store
+**/.DS_Store
+
+# dfx temporary files
+.dfx/
+
+# generated files
+**/declarations/
+
+# rust
+target/
+
+# frontend code
+dist/
+.svelte-kit/
+
 node_modules
 .env
 
 # Hardhat files
-/cache
-/artifacts
+cache
+artifacts
 
 # TypeChain files
-/typechain
-/typechain-types
+typechain
+typechain-types
 
 # solidity-coverage files
-/coverage
-/coverage.json
+coverage
+coverage.json
 
 # Hardhat Ignition default folder for deployments against a local node
 ignition/deployments/chain-31337
