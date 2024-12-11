@@ -1,4 +1,8 @@
-use alloy::{hex, signers::icp::IcpSigner};
+use alloy::{
+    hex,
+    signers::icp::IcpSigner,
+    transports::icp::{RpcApi, RpcService},
+};
 use hex::FromHexError;
 
 pub fn to_hex(data: &[u8]) -> String {
@@ -22,4 +26,11 @@ fn get_ecdsa_key_name() -> String {
 pub async fn create_icp_signer() -> IcpSigner {
     let ecdsa_key_name = get_ecdsa_key_name();
     IcpSigner::new(vec![], &ecdsa_key_name, None).await.unwrap()
+}
+
+pub fn generate_rpc_service(rpc_url: String) -> RpcService {
+    RpcService::Custom(RpcApi {
+        url: rpc_url,
+        headers: None,
+    })
 }
