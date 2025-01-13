@@ -158,9 +158,9 @@ contract bqBTC is ERC20, Ownable {
     modifier onlyBQContracts() {
         require(
             msg.sender == coverAddress ||
-                msg.sender == initialOwner ||
-                msg.sender == vaultContract ||
-                msg.sender == poolAddress,
+            msg.sender == initialOwner ||
+            msg.sender == vaultContract ||
+            msg.sender == poolAddress,
             "Caller is not the governance contract"
         );
         _;

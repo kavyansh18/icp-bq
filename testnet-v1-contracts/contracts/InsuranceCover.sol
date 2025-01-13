@@ -174,7 +174,7 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
         uint256 _cost,
         uint256 _poolId
     ) public onlyOwner {
-        uint256 _maxAmount = _validateAndGetPoolInfo(
+        (uint256 _maxAmount, address _asset, CoverLib.AssetDepositType _adt) = _validateAndGetPoolInfo(
             _coverName,
             _poolId,
             _riskType,
@@ -195,7 +195,9 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
             coverValues: 0,
             maxAmount: _maxAmount,
             poolId: _poolId,
-            CID: _cid
+            CID: _cid,
+            adt: _adt,
+            asset: _asset
         });
         covers[coverId] = cover;
         coverIds.push(coverId);
@@ -210,7 +212,7 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
         uint256 poolId,
         CoverLib.RiskType riskType,
         uint256 capacity
-    ) internal view returns (uint256) {
+    ) internal view returns (uint256, address, CoverLib.AssetDepositType) {
         CoverLib.Cover[] memory coversInPool = lpContract.getPoolCovers(poolId);
         for (uint256 i = 0; i < coversInPool.length; i++) {
             if (
@@ -226,8 +228,8 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
             revert WrongPool();
         }
 
-        uint256 maxAmount = (pool.tvl * ((capacity * 1e18) / 100)) / 1e18;
-        return (maxAmount);
+        uint256 maxAmount = (pool.tvl * capacity) / 100;
+        return (maxAmount, pool.asset, pool.assetType);
     }
 
     function updateCover(
@@ -308,6 +310,7 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
         }
 
         CoverLib.Cover storage cover = covers[_coverId];
+
         if (_coverValue > cover.maxAmount) {
             revert InsufficientPoolBalance();
         }
@@ -457,9 +460,8 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
     function updateMaxAmount(uint256 _coverId) public onlyPool nonReentrant {
         CoverLib.Cover storage cover = covers[_coverId];
         CoverLib.Pool memory pool = lpContract.getPool(cover.poolId);
-        // require(tvl > 0, "TVL is zero");
         require(cover.capacity > 0, "Invalid cover capacity");
-        uint256 amount = (pool.tvl * ((cover.capacity * 1e18) / 100)) / 1e18;
+        uint256 amount = (pool.totalUnit * cover.capacity) / 100;
         covers[_coverId].capacityAmount = amount;
         covers[_coverId].maxAmount = (covers[_coverId].capacityAmount -
             covers[_coverId].coverValues);
@@ -486,9 +488,7 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
             currentTime = depositInfo.expiryDate;
         }
 
-        // uint256 claimableDays = (currentTime - lastClaimTime) / 1 days;   Uncomment
-
-        uint256 claimableDays = (currentTime - lastClaimTime) / 5 minutes;
+        uint256 claimableDays = (currentTime - lastClaimTime) / 1 days;
 
         if (claimableDays <= 0) {
             revert NoClaimableReward();

@@ -27,7 +27,7 @@ interface IVault {
         uint256 minPeriod;
         uint256 tvl;
         uint256 baseValue;
-        uint256 coverTvl;
+        uint256 coverUnits;
         uint256 tcp;
         bool isActive;
         uint256 percentageSplitBalance;
@@ -148,8 +148,10 @@ contract InsurancePool is ReentrancyGuard, Ownable {
     event PoolUpdated(uint256 indexed poolId, uint256 apy, uint256 _minPeriod);
     event ClaimAttempt(uint256, uint256, address);
 
-    constructor(address _initialOwner) Ownable(_initialOwner) {
+    constructor(address _initialOwner, address bq) Ownable(_initialOwner) {
         initialOwner = _initialOwner;
+        bqBTC = IbqBTC(bq);
+        bqBTCAddress = bq;
     }
 
     function createPool(
@@ -165,9 +167,10 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         newPool.id = params.poolId;
         newPool.poolName = params.poolName;
         newPool.apy = params.apy;
+        newPool.totalUnit = 0;
         newPool.minPeriod = params.minPeriod;
         newPool.tvl = 0;
-        newPool.coverTvl = 0;
+        newPool.coverUnits = 0;
         newPool.baseValue = 0;
         newPool.isActive = true;
         newPool.riskType = params.riskType;
@@ -229,9 +232,10 @@ contract InsurancePool is ReentrancyGuard, Ownable {
                 riskType: pool.riskType,
                 apy: pool.apy,
                 minPeriod: pool.minPeriod,
+                totalUnit: pool.totalUnit,
                 tvl: pool.tvl,
                 baseValue: pool.baseValue,
-                coverTvl: pool.coverTvl,
+                coverUnits: pool.coverUnits,
                 tcp: pool.tcp,
                 isActive: pool.isActive,
                 percentageSplitBalance: pool.percentageSplitBalance,
@@ -311,7 +315,7 @@ contract InsurancePool is ReentrancyGuard, Ownable {
                     ].amount,
                     apy: pool.apy,
                     minPeriod: pool.minPeriod,
-                    tvl: pool.tvl,
+                    totalUnit: pool.totalUnit,
                     tcp: pool.tcp,
                     isActive: pool.isActive,
                     accruedPayout: accruedPayout
@@ -338,12 +342,12 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         );
 
         userDeposit.status = CoverLib.Status.Withdrawn;
-        selectedPool.tvl -= userDeposit.amount;
-        uint256 baseValue = selectedPool.tvl -
-            ((selectedPool.investmentArmPercent * selectedPool.tvl) / 100);
+        selectedPool.totalUnit -= userDeposit.amount;
+        uint256 baseValue = selectedPool.totalUnit -
+            ((selectedPool.investmentArmPercent * selectedPool.totalUnit) / 100);
 
-        uint256 coverTvl = baseValue * selectedPool.leverage;
-        selectedPool.coverTvl = coverTvl;
+        uint256 coverUnits = baseValue * selectedPool.leverage;
+        selectedPool.coverUnits = coverUnits;
         selectedPool.baseValue = baseValue;
         CoverLib.Cover[] memory poolCovers = getPoolCovers(_poolId);
         for (uint i = 0; i < poolCovers.length; i++) {
@@ -360,6 +364,8 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         //     (bool success, ) = msg.sender.call{value: userDeposit.amount}("");
         //     require(success, "Native asset transfer failed");
         // }
+
+        bqBTC.burn(msg.sender, userDeposit.amount);
 
         emit Withdraw(msg.sender, userDeposit.amount, selectedPool.poolName);
     }
@@ -387,8 +393,8 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         uint256 baseValue = selectedPool.tvl -
             ((selectedPool.investmentArmPercent * selectedPool.tvl) / 100);
 
-        uint256 coverTvl = baseValue * selectedPool.leverage;
-        selectedPool.coverTvl = coverTvl;
+        uint256 coverUnits = baseValue * selectedPool.leverage;
+        selectedPool.coverUnits = coverUnits;
         selectedPool.baseValue = baseValue;
         CoverLib.Cover[] memory poolCovers = getPoolCovers(_poolId);
         for (uint i = 0; i < poolCovers.length; i++) {
@@ -454,23 +460,23 @@ contract InsurancePool is ReentrancyGuard, Ownable {
                 poolCanister,
                 depositParam.amount
             );
-            selectedPool.tvl += depositParam.amount;
+            selectedPool.totalUnit += depositParam.amount;
             price = depositParam.amount;
         } else {
             require(msg.value > 0, "Deposit cannot be zero");
             (bool sent, ) = payable(poolCanister).call{value: msg.value}("");
             require(sent, "Failed to send Ether to poolCanister");
 
-            selectedPool.tvl += msg.value;
+            selectedPool.totalUnit += msg.value;
             price = msg.value;
         }
 
         uint256 baseValue = selectedPool.tvl -
             ((selectedPool.investmentArmPercent * selectedPool.tvl) / 100);
 
-        uint256 coverTvl = baseValue * selectedPool.leverage;
+        uint256 coverUnits = baseValue * selectedPool.leverage;
 
-        selectedPool.coverTvl = coverTvl;
+        selectedPool.coverUnits = coverUnits;
         selectedPool.baseValue = baseValue;
 
         uint256 dailyPayout = (price * selectedPool.apy) / 100 / 365;
@@ -515,6 +521,7 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         }
 
         participation[depositParam.depositor] += 1;
+        bqBTC.bqMint(depositParam.depositor, price);
 
         emit Deposited(
             depositParam.depositor,

@@ -164,8 +164,10 @@ contract Vaults is ReentrancyGuard, Ownable {
     event PoolUpdated(uint256 indexed poolId, uint256 apy, uint256 _minPeriod);
     event ClaimAttempt(uint256, uint256, address);
 
-    constructor(address _initialOwner) Ownable(_initialOwner) {
+    constructor(address _initialOwner, address bq) Ownable(_initialOwner) {
         initialOwner = _initialOwner;
+        bqBTC = IbqBTC(bq);
+        bqBTCAddress = bq;
     }
 
     function createVault(
@@ -239,6 +241,7 @@ contract Vaults is ReentrancyGuard, Ownable {
         }
 
         userVaultDeposit.status = CoverLib.Status.Due;
+        bqBTC.burn(msg.sender, userVaultDeposit.amount);
 
         emit Withdraw(msg.sender, userVaultDeposit.amount, vault.vaultName);
     }
