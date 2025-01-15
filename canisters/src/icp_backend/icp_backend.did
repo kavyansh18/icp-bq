@@ -1,3 +1,17 @@
-service : {
-    "greet": (text) -> (text) query;
+type Result = variant { Ok : text; Err : text };
+type Result_1 = variant { Ok; Err : text };
+type Result_2 = variant { Ok : nat; Err : text };
+service : (principal) -> {
+  Poolwithdraw : (nat64, text, nat8, nat64) -> (Result);
+  addNetworkAsset : (nat64, text) -> (Result_1);
+  addNewNetwork : (text, nat64, text, vec text, text, text, text, text) -> (
+      Result_1,
+    );
+  claimProposalFunds : (nat64, text, nat64) -> (Result);
+  getNetworkTVL : (text, nat) -> (Result_2) query;
+  getOwner : () -> (opt principal) query;
+  getTotalTVL : () -> (Result_2) query;
+  setOwner : (principal) -> (Result_1);
+  setPoolContractAddress : (text) -> (Result_1);
+  vaultwithdraw : (nat64, text, nat8, nat64) -> (Result);
 }
