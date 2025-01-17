@@ -1,7 +1,7 @@
 type Result = variant { Ok : text; Err : text };
 type Result_1 = variant { Ok; Err : text };
 type Result_2 = variant { Ok : nat; Err : text };
-service : (principal) -> {
+service : () -> {
   Poolwithdraw : (nat64, text, nat8, nat64) -> (Result);
   addNetworkAsset : (nat64, text) -> (Result_1);
   addNewNetwork : (text, nat64, text, vec text, text, text, text, text) -> (

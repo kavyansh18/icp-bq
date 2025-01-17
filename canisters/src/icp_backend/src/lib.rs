@@ -169,12 +169,11 @@ struct State {
 }
 
 #[init]
-async fn init(owner: Principal) {
+async fn init() {
     let signer = create_icp_signer().await;
     let address = signer.address();
     STATE.with(|state| {
         let mut state = state.borrow_mut();
-        state.owner = Some(owner);
         state.icp_pool_contract_address = address.to_string();
     });
 }
