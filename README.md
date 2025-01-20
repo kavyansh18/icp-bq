@@ -19,4 +19,7 @@ BQ Labs v1 Testnet contract leverages the use of ICP's technologies to enable se
   For making HTTP calls
 
 - **Liquid Insurance Tokens (LITs) :**
-The use of LITs on the individual networks to represent users staked/ deposited assets 
+  The use of LITs on the individual networks to represent users staked/ deposited assets
+
+- ICP canister URL :
+  icp_backend: https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=lpi4p-cqaaa-aaaal-qsgaa-cai
