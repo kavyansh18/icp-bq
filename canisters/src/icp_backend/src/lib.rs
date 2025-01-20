@@ -6,7 +6,6 @@ use alloy::rpc::types::TransactionRequest;
 use alloy::signers::icp::IcpSigner;
 use alloy::signers::Signer;
 use alloy::sol_types::{SolCall, SolValue};
-use alloy::transports::http::reqwest::Url;
 use alloy::transports::icp::IcpConfig;
 use alloy::{primitives::Address, sol};
 use candid::{CandidType, Deserialize, Nat, Principal};
@@ -16,6 +15,7 @@ use ic_cdk::api::management_canister::http_request::{
 use ic_cdk_macros::*;
 use serde::Serialize;
 use std::collections::HashMap;
+use std::time::Duration;
 use std::{cell::RefCell, str::FromStr};
 use types::{
     EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks, UserVaultDeposit,
@@ -170,11 +170,17 @@ struct State {
 
 #[init]
 async fn init() {
-    let signer = create_icp_signer().await;
-    let address = signer.address();
-    STATE.with(|state| {
-        let mut state = state.borrow_mut();
-        state.icp_pool_contract_address = address.to_string();
+    ic_cdk_timers::set_timer(Duration::from_secs(0), || {
+        ic_cdk::spawn(async move {
+            let signer = create_icp_signer().await;
+            let address = signer.address();
+            STATE.with(|state| {
+                let mut state = state.borrow_mut();
+                state.icp_pool_contract_address = address.to_string();
+            });
+
+            ic_cdk::println!("Initialising signer for address: {}", address);
+        });
     });
 }
 
@@ -252,13 +258,14 @@ async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, 
         })
         .map_err(|e| format!("Failed to serialize JSON-RPC request: {}", e))?;
 
-        let parsed_url =
-            Url::parse(&new_network_rpc).map_err(|e| format!("Invalid RPC URL: {}", e))?;
+        // let parsed_url =
+        //     Url::parse(&new_network_rpc).map_err(|e| format!("Invalid RPC URL: {}", e))?;
 
-        let host = parsed_url
-            .host_str()
-            .ok_or("Invalid RPC URL host")?
-            .to_string();
+        // let host = parsed_url
+        //     .host_str()
+        //     .ok_or("Invalid RPC URL host")?
+        //     .to_string();
+        let host = new_network_rpc.clone();
 
         let request_headers = vec![
             HttpHeader {

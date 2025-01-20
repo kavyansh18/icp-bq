@@ -46,8 +46,8 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "alloy"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-consensus",
  "alloy-contract",
@@ -77,8 +77,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-consensus"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
@@ -90,8 +90,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-contract"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-dyn-abi",
  "alloy-json-abi",
@@ -160,8 +160,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-eips"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-eip2930",
  "alloy-eip7702",
@@ -189,8 +189,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-json-rpc"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-primitives",
  "alloy-sol-types",
@@ -202,8 +202,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-network"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -222,8 +222,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-network-primitives"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
@@ -261,8 +261,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-provider"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-chains",
  "alloy-consensus",
@@ -274,7 +274,6 @@ dependencies = [
  "alloy-rpc-client",
  "alloy-rpc-types-eth",
  "alloy-transport",
- "alloy-transport-http",
  "alloy-transport-icp",
  "async-stream",
  "async-trait",
@@ -284,13 +283,11 @@ dependencies = [
  "futures-utils-wasm",
  "lru",
  "pin-project",
- "reqwest",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
  "tokio",
  "tracing",
- "url",
 ]
 
 [[package]]
@@ -317,31 +314,29 @@ dependencies = [
 
 [[package]]
 name = "alloy-rpc-client"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-json-rpc",
  "alloy-transport",
  "alloy-transport-http",
  "alloy-transport-icp",
  "futures",
- "ic-cdk 0.16.0",
- "ic-cdk-timers",
+ "ic-cdk 0.17.1",
+ "ic-cdk-timers 0.11.0",
  "pin-project",
- "reqwest",
  "serde",
  "serde_json",
  "tokio",
  "tokio-stream",
  "tower",
  "tracing",
- "url",
 ]
 
 [[package]]
 name = "alloy-rpc-types"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-rpc-types-eth",
  "alloy-serde",
@@ -350,8 +345,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-rpc-types-eth"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -370,8 +365,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-serde"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-primitives",
  "serde",
@@ -380,8 +375,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-signer"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-primitives",
  "async-trait",
@@ -393,15 +388,15 @@ dependencies = [
 
 [[package]]
 name = "alloy-signer-icp"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-consensus",
  "alloy-network",
  "alloy-primitives",
  "alloy-signer",
  "async-trait",
- "ic-cdk 0.16.0",
+ "ic-cdk 0.17.1",
  "thiserror 1.0.69",
 ]
 
@@ -480,8 +475,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-transport"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-json-rpc",
  "base64",
@@ -498,27 +493,22 @@ dependencies = [
 
 [[package]]
 name = "alloy-transport-http"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
- "alloy-json-rpc",
  "alloy-transport",
- "reqwest",
- "serde_json",
- "tower",
- "tracing",
  "url",
 ]
 
 [[package]]
 name = "alloy-transport-icp"
-version = "0.3.5-icp.0"
-source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.0#6dd81feb25282557bdf16b6e41f926b901d601e1"
+version = "0.3.5-icp.1"
+source = "git+https://github.com/ic-alloy/ic-alloy.git?tag=v0.3.5-icp.1#47a9d0b199f47675497d83a0f64fe42b61ceef1a"
 dependencies = [
  "alloy-json-rpc",
  "alloy-transport",
  "candid 0.10.10",
- "ic-cdk 0.16.0",
+ "ic-cdk 0.17.1",
  "serde",
  "serde_json",
  "tower",
@@ -2084,6 +2074,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "ic-cdk"
+version = "0.17.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "122efbcb0af5280d408a75a57b7dc6e9d92893bf6ed9cc98fe4dcff51f18b67c"
+dependencies = [
+ "candid 0.10.10",
+ "ic-cdk-macros 0.17.1",
+ "ic0",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
 name = "ic-cdk-macros"
 version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2127,6 +2130,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "ic-cdk-macros"
+version = "0.17.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c792bf0d1621c893ccf2bcdeac4ee70121103a03030a1827031a6b3c60488944"
+dependencies = [
+ "candid 0.10.10",
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_tokenstream 0.2.2",
+ "syn 2.0.90",
+]
+
+[[package]]
 name = "ic-cdk-timers"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2134,6 +2151,20 @@ checksum = "0c7c528bbb3d4d934b43a364855995d318649217c7510f40f92ad52eba3ff7be"
 dependencies = [
  "futures",
  "ic-cdk 0.16.0",
+ "ic0",
+ "serde",
+ "serde_bytes",
+ "slotmap",
+]
+
+[[package]]
+name = "ic-cdk-timers"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb8fd812a9e26f6aa00594546f8fbf4d4853f39c3ba794c8ff11ecf86fd3c9e4"
+dependencies = [
+ "futures",
+ "ic-cdk 0.17.1",
  "ic0",
  "serde",
  "serde_bytes",
@@ -2228,7 +2259,7 @@ dependencies = [
  "getrandom",
  "ic-cdk 0.16.0",
  "ic-cdk-macros 0.16.0",
- "ic-cdk-timers",
+ "ic-cdk-timers 0.10.0",
  "ic-kit",
  "serde",
  "serde_derive",
