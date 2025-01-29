@@ -238,77 +238,16 @@ async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, 
     let mut total_tvl: Nat = Nat::from(0u64);
 
     for asset in &network.supported_assets {
-        let balance_call = IERC20::balanceOfCall {
-            account: pool_contract_address,
+        let rpc_service = generate_rpc_service(new_network_rpc.clone());
+        let config = IcpConfig::new(rpc_service);
+        let provider = ProviderBuilder::new().on_icp(config);
+        let contract = ERC20Token::new(Address::from_str(asset).unwrap(), provider.clone());
+        let result = contract.balanceOf(pool_contract_address).call().await;
+
+        let balance = match result {
+            Ok(value) => value.balance,
+            _ => return Err("Invalid balance type".to_string()),
         };
-
-        let call_data = balance_call.abi_encode();
-
-        let json_rpc_payload = serde_json::to_string(&JsonRpcRequest {
-            id: next_id(),
-            jsonrpc: "2.0".to_string(),
-            method: "eth_call".to_string(),
-            params: (
-                EthCallParams {
-                    to: asset.to_string(), // Asset contract address
-                    data: to_hex(&call_data),
-                },
-                "latest".to_string(),
-            ),
-        })
-        .map_err(|e| format!("Failed to serialize JSON-RPC request: {}", e))?;
-
-        // let parsed_url =
-        //     Url::parse(&new_network_rpc).map_err(|e| format!("Invalid RPC URL: {}", e))?;
-
-        // let host = parsed_url
-        //     .host_str()
-        //     .ok_or("Invalid RPC URL host")?
-        //     .to_string();
-        let host = new_network_rpc.clone();
-
-        let request_headers = vec![
-            HttpHeader {
-                name: "Content-Type".to_string(),
-                value: "application/json".to_string(),
-            },
-            HttpHeader {
-                name: "Host".to_string(),
-                value: host,
-            },
-        ];
-
-        let request = CanisterHttpRequestArgument {
-            url: new_network_rpc.clone(),
-            max_response_bytes: Some(MAX_RESPONSE_BYTES),
-            method: HttpMethod::POST,
-            headers: request_headers,
-            body: Some(json_rpc_payload.as_bytes().to_vec()),
-            transform: Some(TransformContext::from_name("transform".to_string(), vec![])),
-        };
-
-        let (response,) = http_request(request, HTTP_CYCLES)
-            .await
-            .map_err(|(code, msg)| format!("HTTP request failed: {:?} {:?}", code, msg))?;
-
-        let json: JsonRpcResult = serde_json::from_str(
-            std::str::from_utf8(&response.body)
-                .map_err(|e| format!("Failed to convert response to UTF-8: {}", e))?,
-        )
-        .map_err(|e| format!("Failed to parse JSON response: {}", e))?;
-
-        if let Some(err) = json.error {
-            return Err(format!("JSON-RPC error code {}: {}", err.code, err.message));
-        }
-
-        let balance_result = from_hex(&json.result.ok_or("No result in JSON-RPC response")?)
-            .map_err(|e| format!("Failed to decode hex result: {:?}", e))?;
-
-        let balance = U256::from_be_bytes::<32>(
-            balance_result
-                .try_into()
-                .map_err(|_| "Balance bytes conversion failed")?,
-        );
 
         let balance_as_nat = Nat::from(
             balance.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
