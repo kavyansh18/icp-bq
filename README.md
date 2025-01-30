@@ -51,3 +51,7 @@ During development, you can run the frontend with hot reloading using Vite.
 ```
 pnpm run dev
 ```
+
+### Frontend Integration
+
+https://github.com/bitquid-labs/testnet-v1/blob/main/canisters/README.md#frontend-integration
