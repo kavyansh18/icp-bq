@@ -8,6 +8,7 @@ service : () -> {
       Result_1,
     );
   claimProposalFunds : (nat64, text, nat64) -> (Result);
+  getCanisterAddress : () -> (text) query;
   getNetworkTVL : (text, nat) -> (Result_2) query;
   getOwner : () -> (opt principal) query;
   getTotalTVL : () -> (Result_2) query;
