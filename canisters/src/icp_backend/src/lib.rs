@@ -162,8 +162,7 @@ thread_local! {
 #[derive(CandidType, Deserialize, Default)]
 struct State {
     owner: Option<Principal>,
-    icp_pool_contract_address: String,
-    icp_pool_canister: Option<Principal>,
+    icp_contract_address: String,
     cover_contract: String,
     supported_networks: HashMap<Nat, Networks>, // chain id to the network RPC
 }
@@ -176,7 +175,7 @@ async fn init() {
             let address = signer.address();
             STATE.with(|state| {
                 let mut state = state.borrow_mut();
-                state.icp_pool_contract_address = address.to_string();
+                state.icp_contract_address = address.to_string();
             });
 
             ic_cdk::println!("Initialising signer for address: {}", address);
@@ -227,7 +226,7 @@ async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, 
             None => panic!("Network with chain_id {chain_id} not found"),
         };
 
-        let pool_contract_address = match Address::from_str(&state.icp_pool_contract_address) {
+        let pool_contract_address = match Address::from_str(&state.icp_contract_address) {
             Ok(address) => address,
             Err(_) => panic!("Error parsing pool contract address"),
         };
@@ -648,6 +647,11 @@ fn get_owner() -> Option<Principal> {
     STATE.with(|state| state.borrow().owner)
 }
 
+#[query(name = "getCanisterAddress")]
+fn get_canister_address() -> String {
+    STATE.with(|state| state.borrow().icp_contract_address.clone())
+}
+
 #[update(name = "setOwner")]
 fn set_owner(new_owner: Principal) -> Result<(), String> {
     let caller = ic_cdk::caller();
@@ -889,7 +893,7 @@ fn set_pool_contract(pool_contract: String) -> Result<(), String> {
         if state.owner != Some(caller) {
             return Err("Only the current owner can set a new owner".to_string());
         }
-        state.icp_pool_contract_address = pool_contract;
+        state.icp_contract_address = pool_contract;
         Ok(())
     })
 }
