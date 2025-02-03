@@ -648,8 +648,13 @@ fn get_owner() -> Option<Principal> {
 }
 
 #[query(name = "getCanisterAddress")]
-fn get_canister_address() -> String {
-    STATE.with(|state| state.borrow().icp_contract_address.clone())
+fn get_canister_address() -> Result<String, String> {
+    let address = STATE.with(|state| state.borrow().icp_contract_address.clone());
+    if address.is_empty() {
+        return Err("Canister address not set".to_string());
+    }
+
+    Ok(address)
 }
 
 #[update(name = "setOwner")]
