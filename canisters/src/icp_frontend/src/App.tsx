@@ -1,40 +1,37 @@
-import { useEffect, useState } from "react";
-import { createActor } from './utils/Canister-config';
+import React, { Suspense } from "react";
+import {
+  Navigate,
+  Route,
+  Routes,
+  BrowserRouter as Router,
+} from "react-router-dom";
+import "./App.css";
+import MainLayout from "./views/MainLayout";
+import { appRoutes } from "./constants/routes";
+import NotFoundPage from "./pages/NotFoundPage";
 
-const App = () => {
-  const [statusMessage, setStatusMessage] = useState("Checking connection...");
-
-  useEffect(() => {
-    const testConnection = async () => {
-      try {
-        console.log("Starting to create actor...");
-        const actor = await createActor();
-        console.log("Actor created:", actor);
-
-        // Call the backend method `getTotalTVL`
-        const result = await actor.getTotalTVL() as { Ok?: number; Err?: string };
-        console.log("Result from getTotalTVL:", result);
-
-        if ("Ok" in result) {
-          setStatusMessage(`Connected successfully! Total TVL: ${result.Ok}`);
-        } else {
-          setStatusMessage(`Error from backend: ${result.Err}`);
-        }
-      } catch (error) {
-        console.error("Error in useEffect:", error);
-        setStatusMessage("Failed to connect to the canister.");
-      }
-    };
-
-    testConnection();
-  }, []);
-
+function App() {
   return (
-    <div>
-      <h1 className="text-blue-500">ICP Canister Connection Test</h1>
-      <p>{statusMessage}</p>
-    </div>
+    <Router>
+      <MainLayout>
+        <Routes>
+          {appRoutes.map((item) => (
+            <Route
+              key={item.key}
+              path={item.path}
+              element={
+                <Suspense fallback={null}>
+                  {item.element && <item.element />}
+                </Suspense>
+              }
+            />
+          ))}
+          <Route path="/" element={<Navigate to={"/dashboard"} />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </MainLayout>
+    </Router>
   );
-};
+}
 
 export default App;
