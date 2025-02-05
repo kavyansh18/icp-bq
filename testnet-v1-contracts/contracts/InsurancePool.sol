@@ -488,7 +488,8 @@ contract InsurancePool is ReentrancyGuard, Ownable {
             status: CoverLib.Status.Active,
             daysLeft: depositParam.period,
             startDate: block.timestamp,
-            expiryDate: block.timestamp + (depositParam.period * 1 days),
+            expiryDate: block.timestamp + (depositParam.period * 1 seconds),
+            // expiryDate: block.timestamp + (depositParam.period * 1 days), change to seconds for testing. uncomment for production
             accruedPayout: 0,
             pdt: depositParam.pdt
         });
