@@ -108,6 +108,19 @@ pub struct Deposit {
     pub accrued_payout: Nat,
 }
 
+#[derive(Clone, CandidType, Deserialize)]
+pub struct UserDeposit {
+    pub lp: Principal,
+    pub amount: Nat,
+    pub pool_id: Nat,
+    pub daily_payout: Nat,
+    pub days_left: Nat,
+    pub start_date: Nat,
+    pub expiry_date: Nat,
+    pub accrued_payout: Nat,
+    pub asset: String,
+}
+
 #[derive(Clone, CandidType, Deserialize, PartialEq)]
 pub enum Status {
     Active,

@@ -18,7 +18,8 @@ use std::collections::HashMap;
 use std::time::Duration;
 use std::{cell::RefCell, str::FromStr};
 use types::{
-    EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks, UserVaultDeposit,
+    Deposit, EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks,
+    UserDeposit, UserVaultDeposit,
 };
 use util::{create_icp_signer, from_hex, generate_rpc_service, to_hex};
 
@@ -393,6 +394,100 @@ async fn pool_withdraw(
     }
 }
 
+#[query(name = "getUserPoolDeposit")]
+async fn get_user_pool_deposit(
+    pool_id: u64,
+    user: String,
+    pool_deposit_type: u8,
+    chain_id: u64,
+) -> Result<UserDeposit, String> {
+    let nat_chain_id = Nat::from(chain_id);
+
+    let network = STATE.with(|state| {
+        let state = state.borrow();
+
+        let network = match state.supported_networks.get(&nat_chain_id) {
+            Some(network) => network,
+            None => panic!("Network with chain_id {} not found", chain_id),
+        };
+
+        network.clone()
+    });
+
+    let pool_contract_address = match Address::from_str(&network.evm_pool_contract_address) {
+        Ok(address) => address,
+        Err(_) => panic!("Error parsing pool contract address"),
+    };
+
+    let user_address = match Address::from_str(&user) {
+        Ok(address) => address,
+        Err(e) => panic!("Error parsing user address {}", e),
+    };
+
+    let pdt = match pool_deposit_type {
+        0 => DepositType::Normal,
+        1 => DepositType::Vault,
+        _ => return Err("Invalid deposit type".to_string()),
+    };
+
+    let pool_call = IPool::getUserGenericDepositCall {
+        _poolId: U256::from(pool_id),
+        _user: user_address,
+        pdt: pdt,
+    };
+
+    let call_data = pool_call.abi_encode();
+
+    let result =
+        make_json_rpc_request(&pool_contract_address, call_data, network.rpc_url.clone()).await?;
+
+    let decoded_result = GenericDepositDetails::abi_decode(&result, false)
+        .map_err(|e| format!("Failed to decode response: {}", e))?;
+    println!("Decoded Result: {:?}", decoded_result);
+
+    let poolid_as_nat = Nat::from(
+        decoded_result.poolId.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
+    );
+
+    let amount_as_nat = Nat::from(
+        decoded_result.amount.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
+    );
+
+    let dailypayout_as_nat = Nat::from(
+        decoded_result.dailyPayout.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
+    );
+
+    let days_left = Nat::from(
+        decoded_result.daysLeft.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
+    );
+
+    let start_date = Nat::from(
+        decoded_result.startDate.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
+    );
+
+    let expiry_date = Nat::from(
+        decoded_result.expiryDate.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
+    );
+
+    let accrued_payout = Nat::from(
+        decoded_result.daysLeft.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
+    );
+
+    let deposit_detail = UserDeposit {
+        lp: Principal::from_str(&decoded_result.lp.to_string()).map_err(|e| e.to_string())?,
+        amount: amount_as_nat,
+        pool_id: poolid_as_nat,
+        daily_payout: dailypayout_as_nat,
+        days_left,
+        start_date,
+        expiry_date,
+        accrued_payout,
+        asset: decoded_result.asset.to_string(),
+    };
+
+    Ok(deposit_detail)
+}
+
 #[update(name = "vaultwithdraw")]
 async fn vault_withdraw(
     vault_id: u64,
@@ -706,6 +801,19 @@ fn add_new_network(
 
         state.supported_networks.insert(nat_chain_id, network);
         Ok(())
+    })
+}
+
+#[query(name = "getNetworks")]
+fn get_network(chain_id: u64) -> Result<Networks, String> {
+    let nat_chain_id = Nat::from(chain_id);
+    STATE.with(|state| {
+        let state = state.borrow();
+        state
+            .supported_networks
+            .get(&nat_chain_id)
+            .cloned()
+            .ok_or(format!("Network with chain_id {} not found", chain_id))
     })
 }
 
