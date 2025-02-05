@@ -15,6 +15,7 @@ import PoolList from "views/Deposit/Pools/PoolList";
 import { useAllPools } from "hooks/contracts/useAllPools";
 import GetTotalTVL from "../ICPfunctions/GetTotalTVL";
 import GetCanisterAddress from "../ICPfunctions/GetCanisterAddress";
+import GetChainID from "../ICPfunctions/GetChainID";
 
 type IPoolWithDetails = IPool & {
   displayDetails: boolean;
@@ -163,6 +164,7 @@ const DepositPage: React.FC = () => {
       </div>
       <div> <GetTotalTVL /> </div>
       <div> <GetCanisterAddress /> </div>
+      <div> <GetChainID /> </div>
       {currentDepositType === DepositType.Vault ? (
         <>
           {currentVaultId ? (
