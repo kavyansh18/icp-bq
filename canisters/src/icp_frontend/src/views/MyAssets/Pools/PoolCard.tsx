@@ -9,6 +9,7 @@ import { IPoolInfo } from "types/common";
 import { usePoolDeposit } from "hooks/contracts/usePoolDeposit";
 import { bnToNumber, numberToBN } from "lib/number";
 import { getPoolRiskTypeName } from "lib/utils";
+import { createActor } from '../../../utils/CanisterConfig';
 
 type Props = {
   poolDetail: IPoolInfo;
@@ -21,34 +22,70 @@ const PoolCard: React.FC<Props> = ({ poolDetail }) => {
   const [isWithdrawLoading, setIsWithdrawLoading] = useState<boolean>(false);
   const { callContractFunction } = useCallContract();
 
+  // const handleWithdrawStake = async () => {
+  //   setIsWithdrawLoading(true);
+  //   setLoadingMessage("Withdrawing...");
+  //   const params = [poolDetail.poolId];
+  //   console.log("pool params",poolDetail);
+
+  //   try {
+  //     await callContractFunction(
+  //       InsurancePoolContract.abi,
+  //       InsurancePoolContract.addresses[
+  //         (chain as ChainType)?.chainNickName
+  //       ] as `0x${string}`,
+  //       "poolWithdrawal",
+  //       params,
+  //       0n,
+  //       () => {
+  //         toast.success("Withdraw succeed");
+  //         setLoadingMessage("");
+  //         setIsWithdrawLoading(false);
+  //       },
+  //       () => {
+  //         setLoadingMessage("");
+  //         setIsWithdrawLoading(false);
+  //         toast.success("Failed to withdraw");
+  //       }
+  //     );
+  //   } catch (error) {
+  //     setIsWithdrawLoading(false);
+  //     console.log("error:", error);
+  //   }
+  // };
+
   const handleWithdrawStake = async () => {
     setIsWithdrawLoading(true);
     setLoadingMessage("Withdrawing...");
-    const params = [poolDetail.poolId];
 
     try {
-      await callContractFunction(
-        InsurancePoolContract.abi,
-        InsurancePoolContract.addresses[
-          (chain as ChainType)?.chainNickName
-        ] as `0x${string}`,
-        "poolWithdrawal",
-        params,
-        0n,
-        () => {
-          toast.success("Withdraw succeed");
-          setLoadingMessage("");
-          setIsWithdrawLoading(false);
-        },
-        () => {
-          setLoadingMessage("");
-          setIsWithdrawLoading(false);
-          toast.success("Failed to withdraw");
-        }
-      );
+      console.log("Starting to create actor...");
+      const actor = await createActor();
+      console.log("Actor created:", actor);
+
+      // Hardcoded test parameters
+      const poolId = BigInt(1); // nat64
+      const tokenId = "TOKEN123"; // text
+      const decimals = 8; // nat8
+      const amount = BigInt(1000000); // nat64
+
+      // Call the backend method `Poolwithdraw`
+      const result = await actor.Poolwithdraw(poolId, tokenId, decimals, amount) as { Ok?: any; Err?: string };
+      console.log("Result from Poolwithdraw:", result);
+
+      if ("Ok" in result) {
+        toast.success("Withdraw succeeded");
+        setLoadingMessage("");
+      } else {
+        toast.error(`Failed to withdraw: ${result.Err}`);
+        setLoadingMessage("");
+      }
     } catch (error) {
+      console.error("Error in withdrawal:", error);
+      toast.error("Failed to process withdrawal");
+      setLoadingMessage("");
+    } finally {
       setIsWithdrawLoading(false);
-      console.log("error:", error);
     }
   };
 

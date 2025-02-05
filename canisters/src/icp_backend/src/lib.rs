@@ -261,9 +261,9 @@ async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, 
 #[update(name = "Poolwithdraw")]
 async fn pool_withdraw(
     pool_id: u64,
-    user: String,
+    user: String, //useraddress
     pool_deposit_type: u8,
-    chain_id: u64,
+    chain_id: u64, 
 ) -> Result<String, String> {
     let nat_chain_id = Nat::from(chain_id);
 
