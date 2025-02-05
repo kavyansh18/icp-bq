@@ -1,8 +1,30 @@
+type Networks = record {
+  vault_contract : text;
+  name : text;
+  gov_address : text;
+  evm_pool_contract_address : text;
+  cover_address : text;
+  rpc_url : text;
+  supported_assets : vec text;
+};
 type Result = variant { Ok : text; Err : text };
 type Result_1 = variant { Ok; Err : text };
 type Result_2 = variant { Ok : nat; Err : text };
+type Result_3 = variant { Ok : Networks; Err : text };
+type Result_4 = variant { Ok : UserDeposit; Err : text };
+type UserDeposit = record {
+  lp : principal;
+  asset : text;
+  accrued_payout : nat;
+  start_date : nat;
+  expiry_date : nat;
+  days_left : nat;
+  pool_id : nat;
+  daily_payout : nat;
+  amount : nat;
+};
 service : () -> {
-  Poolwithdraw : (nat64, text, nat8, nat64) -> (Result);     
+  Poolwithdraw : (nat64, text, nat8, nat64) -> (Result);
   addNetworkAsset : (nat64, text) -> (Result_1);
   addNewNetwork : (text, nat64, text, vec text, text, text, text, text) -> (
       Result_1,
@@ -10,9 +32,11 @@ service : () -> {
   claimProposalFunds : (nat64, text, nat64) -> (Result);
   getCanisterAddress : () -> (Result) query;
   getNetworkTVL : (text, nat) -> (Result_2) query;
+  getNetworks : (nat64) -> (Result_3) query;
   getOwner : () -> (opt principal) query;
   getTotalTVL : () -> (Result_2) query;
+  getUserPoolDeposit : (nat64, text, nat8, nat64) -> (Result_4) query;
   setOwner : (principal) -> (Result_1);
   setPoolContractAddress : (text) -> (Result_1);
-  vaultwithdraw : (nat64, text, nat8, nat64) -> (Result);      
+  vaultwithdraw : (nat64, text, nat8, nat64) -> (Result);
 }
