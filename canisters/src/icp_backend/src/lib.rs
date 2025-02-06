@@ -18,8 +18,8 @@ use std::collections::HashMap;
 use std::time::Duration;
 use std::{cell::RefCell, str::FromStr};
 use types::{
-    Deposit, EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks,
-    UserDeposit, UserVaultDeposit,
+    EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks, UserDeposit,
+    UserVaultDeposit,
 };
 use util::{create_icp_signer, from_hex, generate_rpc_service, to_hex};
 
