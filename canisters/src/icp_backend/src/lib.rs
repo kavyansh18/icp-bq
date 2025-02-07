@@ -160,6 +160,12 @@ thread_local! {
     static NONCE: RefCell<Option<u64>> = RefCell::new(None);
 }
 
+impl std::fmt::Debug for ERC20Token::balanceOfReturn {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "balanceOfReturn({:?})", self)
+    }
+}
+
 #[derive(CandidType, Deserialize, Default)]
 struct State {
     owner: Option<Principal>,
@@ -241,8 +247,12 @@ async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, 
         let rpc_service = generate_rpc_service(new_network_rpc.clone());
         let config = IcpConfig::new(rpc_service);
         let provider = ProviderBuilder::new().on_icp(config);
+        ic_cdk::println!("Asset: {}", asset);
+        ic_cdk::println!("Network: {:?}", network);
         let contract = ERC20Token::new(Address::from_str(asset).unwrap(), provider.clone());
         let result = contract.balanceOf(pool_contract_address).call().await;
+
+        ic_cdk::println!("Result: {:?}", result);
 
         let balance = match result {
             Ok(value) => value.balance,

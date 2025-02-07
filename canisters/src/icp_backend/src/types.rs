@@ -141,7 +141,7 @@ pub struct PoolInfo {
     pub accrued_payout: Nat,
 }
 
-#[derive(Clone, CandidType, Deserialize)]
+#[derive(Clone, CandidType, Deserialize, Debug)]
 pub struct Networks {
     pub name: String,
     pub rpc_url: String,
