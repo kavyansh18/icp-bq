@@ -51,10 +51,10 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'getCanisterAddress' : IDL.Func([], [Result], ['query']),
-    'getNetworkTVL' : IDL.Func([IDL.Text, IDL.Nat], [Result_2], ['query']),
+    'getNetworkTVL' : IDL.Func([IDL.Text, IDL.Nat], [Result_2], []),
     'getNetworks' : IDL.Func([IDL.Nat64], [Result_3], ['query']),
     'getOwner' : IDL.Func([], [IDL.Opt(IDL.Principal)], ['query']),
-    'getTotalTVL' : IDL.Func([], [Result_2], ['query']),
+    'getTotalTVL' : IDL.Func([], [Result_2], []),
     'getUserPoolDeposit' : IDL.Func(
         [IDL.Nat64, IDL.Text, IDL.Nat8, IDL.Nat64],
         [Result_4],

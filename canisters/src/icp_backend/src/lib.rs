@@ -18,8 +18,8 @@ use std::collections::HashMap;
 use std::time::Duration;
 use std::{cell::RefCell, str::FromStr};
 use types::{
-    Deposit, EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks,
-    UserDeposit, UserVaultDeposit,
+    EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks, UserDeposit,
+    UserVaultDeposit,
 };
 use util::{create_icp_signer, from_hex, generate_rpc_service, to_hex};
 
@@ -160,6 +160,12 @@ thread_local! {
     static NONCE: RefCell<Option<u64>> = RefCell::new(None);
 }
 
+impl std::fmt::Debug for ERC20Token::balanceOfReturn {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "balanceOfReturn({:?})", self)
+    }
+}
+
 #[derive(CandidType, Deserialize, Default)]
 struct State {
     owner: Option<Principal>,
@@ -196,7 +202,7 @@ fn next_id() -> u64 {
     })
 }
 
-#[query(name = "getTotalTVL")]
+#[update(name = "getTotalTVL")]
 async fn get_total_tvl() -> Result<Nat, String> {
     let networks = STATE.with(|state| {
         let state = state.borrow();
@@ -217,7 +223,7 @@ async fn get_total_tvl() -> Result<Nat, String> {
     Ok(total_tvl)
 }
 
-#[query(name = "getNetworkTVL")]
+#[update(name = "getNetworkTVL")]
 async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, String> {
     let (network, pool_contract_address) = STATE.with(|state| {
         let state = state.borrow();
@@ -241,12 +247,16 @@ async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, 
         let rpc_service = generate_rpc_service(new_network_rpc.clone());
         let config = IcpConfig::new(rpc_service);
         let provider = ProviderBuilder::new().on_icp(config);
+        ic_cdk::println!("Asset: {}", asset);
+        ic_cdk::println!("Network: {:?}", network);
         let contract = ERC20Token::new(Address::from_str(asset).unwrap(), provider.clone());
         let result = contract.balanceOf(pool_contract_address).call().await;
 
+        ic_cdk::println!("Result: {:?}", result);
+
         let balance = match result {
             Ok(value) => value.balance,
-            _ => return Err("Invalid balance type".to_string()),
+            Err(e) => return Err(format!("Invalid balance type:{}", e)),
         };
 
         let balance_as_nat = Nat::from(
@@ -777,7 +787,7 @@ fn add_new_network(
     vault_address: String,
 ) -> Result<(), String> {
     let nat_chain_id = Nat::from(chain_id);
-    // let caller = ic_cdk::caller();
+    let caller = ic_cdk::caller();
     let network = Networks {
         name: network_name.clone(),
         rpc_url: new_network_rpc.clone(),

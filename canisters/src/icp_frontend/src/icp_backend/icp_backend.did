@@ -31,10 +31,10 @@ service : () -> {
     );
   claimProposalFunds : (nat64, text, nat64) -> (Result);
   getCanisterAddress : () -> (Result) query;
-  getNetworkTVL : (text, nat) -> (Result_2) query;
+  getNetworkTVL : (text, nat) -> (Result_2);
   getNetworks : (nat64) -> (Result_3) query;
   getOwner : () -> (opt principal) query;
-  getTotalTVL : () -> (Result_2) query;
+  getTotalTVL : () -> (Result_2);
   getUserPoolDeposit : (nat64, text, nat8, nat64) -> (Result_4) query;
   setOwner : (principal) -> (Result_1);
   setPoolContractAddress : (text) -> (Result_1);

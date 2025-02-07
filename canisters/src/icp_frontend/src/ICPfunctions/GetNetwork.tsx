@@ -15,7 +15,7 @@ const GetNetworks = () => {
       console.log("Actor created:", actor);
 
       // Call the backend method `getNetworks` with chain_id 97
-      const chainId = 97;
+      const chainId = 686868;
       const result = await actor.getNetworks(chainId);
       console.log("Result from getNetworks:", result);
 

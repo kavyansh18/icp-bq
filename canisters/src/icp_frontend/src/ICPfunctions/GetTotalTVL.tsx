@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createActor } from '../utils/CanisterConfig';
+import { createActor } from "../utils/CanisterConfig";
 
 const GetTotalTVL = () => {
   const [statusMessage, setStatusMessage] = useState("Checking connection...");
@@ -7,22 +7,27 @@ const GetTotalTVL = () => {
   useEffect(() => {
     const testConnection = async () => {
       try {
-        console.log("Starting to create actor...");
         const actor = await createActor();
-        console.log("Actor created:", actor);
 
-        // Call the backend method `getTotalTVL`
-        const result = await actor.getTotalTVL() as { Ok?: number; Err?: string };
-        console.log("Result from getTotalTVL:", result);
+        if (!actor || typeof actor.getTotalTVL !== "function") {
+          throw new Error("The method 'getTotalTVL' does not exist on the canister actor.");
+        }
 
-        if ("Ok" in result) {
+        // Modify the call to use update method instead of query
+        const result = await actor.getTotalTVL({
+          updateCall: true  // Add this if your actor configuration supports it
+        });
+
+        if (result && typeof result === 'object' && "Ok" in result) {
           setStatusMessage(`${result.Ok}`);
-        } else {
+        } else if (result && typeof result === 'object' && "Err" in result) {
           setStatusMessage(`Error from backend: ${result.Err}`);
+        } else {
+          setStatusMessage("Unexpected response from the canister.");
         }
       } catch (error) {
         console.error("Error in useEffect:", error);
-        setStatusMessage("Failed to connect to the canister.");
+        setStatusMessage("Failed to connect to the canister. Please check your configuration.");
       }
     };
 
@@ -31,7 +36,14 @@ const GetTotalTVL = () => {
 
   return (
     <div className="flex justify-center items-center mt-28">
-      <div><span className="font-semibold text-xl bg-gradient-to-r from-teal-200 to-teal-500 bg-clip-text text-transparent">Total TVL locked in the pools: </span><span className="font-bold text-2xl text-white">{statusMessage}</span></div>
+      <div>
+        <span className="font-semibold text-xl bg-gradient-to-r from-teal-200 to-teal-500 bg-clip-text text-transparent">
+          Total TVL locked in the pools:
+        </span>
+        <span className="font-bold text-2xl text-white ml-2">
+          {statusMessage}
+        </span>
+      </div>
     </div>
   );
 };
