@@ -288,7 +288,8 @@ contract Vaults is ReentrancyGuard, Ownable {
             status: CoverLib.Status.Active,
             daysLeft: _period,
             startDate: block.timestamp,
-            expiryDate: block.timestamp + (_period * 1 days),
+            expiryDate: block.timestamp + (_period * 1 seconds),
+            // expiryDate: block.timestamp + (_period * 1 days), change. uncomment for production. 
             accruedPayout: 0,
             assetType: vault.assetType,
             asset: vault.asset

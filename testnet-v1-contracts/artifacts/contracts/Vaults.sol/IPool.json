@@ -103,6 +103,11 @@
             },
             {
               "internalType": "uint256",
+              "name": "totalUnit",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "tvl",
               "type": "uint256"
             },
@@ -113,7 +118,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "coverTvl",
+              "name": "coverUnits",
               "type": "uint256"
             },
             {

@@ -64,6 +64,16 @@
               "internalType": "uint256",
               "name": "accruedPayout",
               "type": "uint256"
+            },
+            {
+              "internalType": "enum CoverLib.AssetDepositType",
+              "name": "assetType",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address",
+              "name": "asset",
+              "type": "address"
             }
           ],
           "internalType": "struct IVault.VaultDeposit",
@@ -135,7 +145,7 @@
                 },
                 {
                   "internalType": "uint256",
-                  "name": "coverTvl",
+                  "name": "coverUnits",
                   "type": "uint256"
                 },
                 {
@@ -210,6 +220,24 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "setUserVaultDepositToZero",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     }
   ],
