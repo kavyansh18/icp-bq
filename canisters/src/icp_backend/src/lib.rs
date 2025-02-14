@@ -28,6 +28,7 @@ mod util;
 
 const HTTP_CYCLES: u128 = 100_000_000; // Default cycles for HTTP request
 const MAX_RESPONSE_BYTES: u64 = 2048; // Default response size limit
+const NULL_ADDRESS: &str = "0x0000000000000000000000000000000000000000";
 
 sol! {
     #[derive(Debug, Serialize, Deserialize)]
@@ -202,7 +203,7 @@ fn next_id() -> u64 {
     })
 }
 
-#[query(name = "getTotalTVL")]
+#[update(name = "getTotalTVL")]
 async fn get_total_tvl() -> Result<Nat, String> {
     let networks = STATE.with(|state| {
         let state = state.borrow();
@@ -223,7 +224,7 @@ async fn get_total_tvl() -> Result<Nat, String> {
     Ok(total_tvl)
 }
 
-#[query(name = "getNetworkTVL")]
+#[update(name = "getNetworkTVL")]
 async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, String> {
     let (network, pool_contract_address) = STATE.with(|state| {
         let state = state.borrow();
@@ -247,21 +248,29 @@ async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, 
         let rpc_service = generate_rpc_service(new_network_rpc.clone());
         let config = IcpConfig::new(rpc_service);
         let provider = ProviderBuilder::new().on_icp(config);
-        ic_cdk::println!("Asset: {}", asset);
-        ic_cdk::println!("Network: {:?}", network);
-        let contract = ERC20Token::new(Address::from_str(asset).unwrap(), provider.clone());
-        let result = contract.balanceOf(pool_contract_address).call().await;
+        let balance = if asset == NULL_ADDRESS {
+            let result = provider.get_balance(pool_contract_address).await;
+            let balance = match result {
+                Ok(value) => value,
+                Err(e) => return Err(format!("Invalid balance type:{}", e)),
+            };
 
-        ic_cdk::println!("Result: {:?}", result);
+            balance
+        } else {
+            let contract = ERC20Token::new(Address::from_str(asset).unwrap(), provider.clone());
+            let result = contract.balanceOf(pool_contract_address).call().await;
+            // let block = provider.get_block_number().await.unwrap();
+            // println!("Current block number: {:?}", block);
 
-        let balance = match result {
-            Ok(value) => value.balance,
-            _ => return Err("Invalid balance type".to_string()),
+            let balance = match result {
+                Ok(value) => value.balance,
+                Err(e) => return Err(format!("Invalid balance type:{}", e)),
+            };
+
+            balance
         };
 
-        let balance_as_nat = Nat::from(
-            balance.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
-        );
+        let balance_as_nat = Nat::from(balance.try_into().unwrap_or(u128::MAX));
 
         total_tvl += balance_as_nat;
     }
@@ -455,33 +464,19 @@ async fn get_user_pool_deposit(
         .map_err(|e| format!("Failed to decode response: {}", e))?;
     println!("Decoded Result: {:?}", decoded_result);
 
-    let poolid_as_nat = Nat::from(
-        decoded_result.poolId.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
-    );
+    let poolid_as_nat = Nat::from(decoded_result.poolId.try_into().unwrap_or(u128::MAX));
 
-    let amount_as_nat = Nat::from(
-        decoded_result.amount.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
-    );
+    let amount_as_nat = Nat::from(decoded_result.amount.try_into().unwrap_or(u128::MAX));
 
-    let dailypayout_as_nat = Nat::from(
-        decoded_result.dailyPayout.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
-    );
+    let dailypayout_as_nat = Nat::from(decoded_result.dailyPayout.try_into().unwrap_or(u128::MAX));
 
-    let days_left = Nat::from(
-        decoded_result.daysLeft.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
-    );
+    let days_left = Nat::from(decoded_result.daysLeft.try_into().unwrap_or(u128::MAX));
 
-    let start_date = Nat::from(
-        decoded_result.startDate.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
-    );
+    let start_date = Nat::from(decoded_result.startDate.try_into().unwrap_or(u128::MAX));
 
-    let expiry_date = Nat::from(
-        decoded_result.expiryDate.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
-    );
+    let expiry_date = Nat::from(decoded_result.expiryDate.try_into().unwrap_or(u128::MAX));
 
-    let accrued_payout = Nat::from(
-        decoded_result.daysLeft.try_into().unwrap_or(u128::MAX), // Fallback to max u128 if conversion fails
-    );
+    let accrued_payout = Nat::from(decoded_result.daysLeft.try_into().unwrap_or(u128::MAX));
 
     let deposit_detail = UserDeposit {
         lp: Principal::from_str(&decoded_result.lp.to_string()).map_err(|e| e.to_string())?,
