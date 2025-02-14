@@ -12,6 +12,9 @@ dfx canister create icp_backend
 ```bash
 dfx canister create icp_frontend  
 ```
+```bash
+dfx canister create evm_rpc  
+```
 
 ### 3. generate declaration folder
 ```bash
@@ -25,6 +28,9 @@ replace the new icp_backend folder in the declaration folder with the one in the
 ```
 ```bash
 dfx build icp_frontend  
+```
+```bash
+dfx build evm_rpc  
 ```
 
 ### 5. Deploy canisters
