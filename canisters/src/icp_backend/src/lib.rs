@@ -204,7 +204,6 @@ fn next_id() -> u64 {
 }
 
 #[update(name = "getTotalTVL")]
-#[update(name = "getTotalTVL")]
 async fn get_total_tvl() -> Result<Nat, String> {
     let networks = STATE.with(|state| {
         let state = state.borrow();
@@ -225,7 +224,6 @@ async fn get_total_tvl() -> Result<Nat, String> {
     Ok(total_tvl)
 }
 
-#[update(name = "getNetworkTVL")]
 #[update(name = "getNetworkTVL")]
 async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, String> {
     let (network, pool_contract_address) = STATE.with(|state| {
@@ -784,7 +782,7 @@ fn add_new_network(
     vault_address: String,
 ) -> Result<(), String> {
     let nat_chain_id = Nat::from(chain_id);
-    let caller = ic_cdk::caller();
+    // let caller = ic_cdk::caller();
     let network = Networks {
         name: network_name.clone(),
         rpc_url: new_network_rpc.clone(),
