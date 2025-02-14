@@ -204,6 +204,7 @@ fn next_id() -> u64 {
 }
 
 #[update(name = "getTotalTVL")]
+#[update(name = "getTotalTVL")]
 async fn get_total_tvl() -> Result<Nat, String> {
     let networks = STATE.with(|state| {
         let state = state.borrow();
@@ -224,6 +225,7 @@ async fn get_total_tvl() -> Result<Nat, String> {
     Ok(total_tvl)
 }
 
+#[update(name = "getNetworkTVL")]
 #[update(name = "getNetworkTVL")]
 async fn get_network_tvl(new_network_rpc: String, chain_id: Nat) -> Result<Nat, String> {
     let (network, pool_contract_address) = STATE.with(|state| {
@@ -797,9 +799,9 @@ fn add_new_network(
     }
     STATE.with(|state| {
         let mut state = state.borrow_mut();
-        if state.owner != Some(caller) {
-            return Err("Only the current owner can add new network".to_string());
-        }
+        // if state.owner != Some(caller) {
+        //     return Err("Only the current owner can add new network".to_string());
+        // }
         if state.supported_networks.contains_key(&nat_chain_id) {
             return Err("Network with this chain_id already exists".to_string());
         }
