@@ -3,6 +3,7 @@ import { idlFactory } from '../icp_backend';
 
 const canisterId = 'bkyz2-fmaaa-aaaaa-qaaaq-cai';
 // fe cid=bd3sg-teaaa-aaaaa-qaaba-cai
+// evm_rpc = 7hfb6-caaaa-aaaar-qadga-cai
 const canisterUrl = 'http://127.0.0.1:4943/?canisterId=bkyz2-fmaaa-aaaaa-qaaaq-cai'
 
 export const createActor = async () => {
