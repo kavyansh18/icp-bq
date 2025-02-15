@@ -287,23 +287,25 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         }
 
         CoverLib.PoolInfo[] memory result = new CoverLib.PoolInfo[](resultCount);
+        require(resultCount > 0, "No pools found for address");
 
         uint256 resultIndex = 0;
 
         for (uint256 i = 1; i <= poolCount; i++) {
-            CoverLib.Pool storage pool = pools[i];
-            CoverLib.Deposits memory userDeposit = deposits[_userAddress][i][
-                CoverLib.DepositType.Normal
-            ];
-            uint256 claimableDays = ICoverContract.getDepositClaimableDays(
-                _userAddress,
-                i
-            );
-            uint256 accruedPayout = userDeposit.dailyPayout * claimableDays;
             if (
                 deposits[_userAddress][i][CoverLib.DepositType.Normal].amount >
                 0
             ) {
+                require(resultIndex < resultCount, "Index out of bounds");
+                CoverLib.Pool memory pool = pools[i];
+                CoverLib.Deposits memory userDeposit = deposits[_userAddress][i][
+                    CoverLib.DepositType.Normal
+                ];
+                uint256 claimableDays = ICoverContract.getDepositClaimableDays(
+                    _userAddress,
+                    i
+                );
+                uint256 accruedPayout = userDeposit.dailyPayout * claimableDays;
                 result[resultIndex++] = CoverLib.PoolInfo({
                     poolName: pool.poolName,
                     poolId: i,
@@ -674,6 +676,14 @@ contract InsurancePool is ReentrancyGuard, Ownable {
 
     function setPoolCanister(address _poolcanister) external onlyOwner {
         require(poolCanister == address(0), "Pool Canister already set");
+        require(
+            _poolcanister != address(0),
+            "Pool Canister address cannot be zero"
+        );
+        poolCanister = _poolcanister;
+    }
+
+    function updatePoolCanister(address _poolcanister) external onlyOwner {
         require(
             _poolcanister != address(0),
             "Pool Canister address cannot be zero"

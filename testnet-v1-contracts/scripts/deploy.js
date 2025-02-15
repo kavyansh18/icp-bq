@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 
 const OWNER = "0x47C14E2dD82B7Cf0E7426c991225417e4C40Cd19";
 const ALT_TOKEN = "0x73795572FB8c1c737513156ecb8b1Cc9a3f9cA46";
-const poolCanister = "0xCa485959bC6b7e0DaA8fBea0263F4c9aaAE79E7d";
+const poolCanister = "0xFeb5733ABB5CC8F4B5065E24451bdfE13a9355d3";
 // const BSCBTC = "0x6ce8da28e2f864420840cf74474eff5fd80e65b8";
 const MIN = 20000000000000;
 
