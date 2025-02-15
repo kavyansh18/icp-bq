@@ -38,5 +38,8 @@ service : () -> {
   getUserPoolDeposit : (nat64, text, nat8, nat64) -> (Result_4) query;
   setOwner : (principal) -> (Result_1);
   setPoolContractAddress : (text) -> (Result_1);
+  updateNetwork : (text, nat64, text, vec text, text, text, text, text) -> (
+      Result_1,
+    );
   vaultwithdraw : (nat64, text, nat8, nat64) -> (Result);
 }
