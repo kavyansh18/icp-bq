@@ -10,7 +10,8 @@ use alloy::transports::icp::IcpConfig;
 use alloy::{primitives::Address, sol};
 use candid::{CandidType, Deserialize, Nat, Principal};
 use ic_cdk::api::management_canister::http_request::{
-    http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, TransformContext,
+    http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, HttpResponse, TransformArgs,
+    TransformContext,
 };
 use ic_cdk_macros::*;
 use serde::Serialize;
@@ -21,7 +22,7 @@ use types::{
     EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks, UserDeposit,
     UserVaultDeposit,
 };
-use util::{create_icp_signer, from_hex, generate_rpc_service, to_hex};
+use util::{create_icp_signer, from_hex, generate_rpc_service, to_hex, transform_http_request};
 
 mod types;
 mod util;
@@ -1051,6 +1052,11 @@ fn set_pool_contract(pool_contract: String) -> Result<(), String> {
         state.icp_contract_address = pool_contract;
         Ok(())
     })
+}
+
+#[query(name = "__transform_json_rpc", hidden = true)]
+fn transform(args: TransformArgs) -> HttpResponse {
+    transform_http_request(args)
 }
 
 ic_cdk::export_candid!();
