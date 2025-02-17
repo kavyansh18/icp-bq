@@ -1054,7 +1054,7 @@ fn set_pool_contract(pool_contract: String) -> Result<(), String> {
     })
 }
 
-#[query(name = "__transform_json_rpc", hidden = true)]
+#[query]
 fn transform(args: TransformArgs) -> HttpResponse {
     transform_http_request(args)
 }
