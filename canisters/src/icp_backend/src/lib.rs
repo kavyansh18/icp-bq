@@ -1032,6 +1032,11 @@ async fn make_json_rpc_request(
     )
     .map_err(|e| format!("Failed to parse JSON response: {}", e))?;
 
+    let _json_error = match json.error {
+        Some(error) => return Err(format!("Json RPC error: {}", error.message)),
+        None => (),
+    };
+
     let raw_result = json
         .result
         .ok_or("No result in JSON-RPC response".to_string())?;
