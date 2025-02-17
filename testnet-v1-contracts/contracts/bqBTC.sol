@@ -101,6 +101,11 @@ contract bqBTC is ERC20, Ownable {
         _mint(account, amount);
     }
 
+    function newMint(address account) external onlyBQContracts {
+        uint256 amount = 1 * 1000000000000000000;
+        _mint(account, amount);
+    }
+
     function transfer(
         address to,
         uint256 amount
