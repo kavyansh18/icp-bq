@@ -51,6 +51,10 @@ export interface _SERVICE {
   >,
   'setOwner' : ActorMethod<[Principal], Result_1>,
   'setPoolContractAddress' : ActorMethod<[string], Result_1>,
+  'updateNetwork' : ActorMethod<
+    [string, bigint, string, Array<string>, string, string, string, string],
+    Result_1
+  >,
   'vaultwithdraw' : ActorMethod<[bigint, string, number, bigint], Result>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;

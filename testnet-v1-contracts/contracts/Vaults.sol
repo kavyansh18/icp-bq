@@ -404,6 +404,14 @@ contract Vaults is ReentrancyGuard, Ownable {
         poolCanister = _poolcanister;
     }
 
+    function updatePoolCanister(address _poolcanister) external onlyOwner {
+        require(
+            _poolcanister != address(0),
+            "Pool Canister address cannot be zero"
+        );
+        poolCanister = _poolcanister;
+    }
+
     modifier onlyGovernance() {
         require(
             msg.sender == governance || msg.sender == initialOwner,

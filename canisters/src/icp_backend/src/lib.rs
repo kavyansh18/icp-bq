@@ -809,6 +809,43 @@ fn add_new_network(
     })
 }
 
+#[update(name = "updateNetwork")]
+fn update_network(
+    new_network_rpc: String,
+    chain_id: u64,
+    network_name: String,
+    assets: Vec<String>,
+    pool_contract: String,
+    gov_contract: String,
+    cover_contract: String,
+    vault_address: String,
+) -> Result<(), String> {
+    let nat_chain_id = Nat::from(chain_id);
+
+    if new_network_rpc.trim().is_empty() || network_name.trim().is_empty() {
+        return Err("RPC URL and network name cannot be empty".to_string());
+    }
+
+    STATE.with(|state| {
+        let mut state = state.borrow_mut();
+
+        let network = state
+            .supported_networks
+            .get_mut(&nat_chain_id)
+            .ok_or_else(|| format!("Network with chain ID {} does not exist", chain_id))?;
+
+        network.name = network_name;
+        network.rpc_url = new_network_rpc;
+        network.supported_assets = assets;
+        network.cover_address = cover_contract;
+        network.gov_address = gov_contract;
+        network.vault_contract = vault_address;
+        network.evm_pool_contract_address = pool_contract;
+
+        Ok(())
+    })
+}
+
 #[query(name = "getNetworks")]
 fn get_network(chain_id: u64) -> Result<Networks, String> {
     let nat_chain_id = Nat::from(chain_id);

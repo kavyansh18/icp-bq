@@ -8,13 +8,67 @@ import ConnectWalletButton from "components/ConnectWalletButton";
 import { cn } from "lib/utils";
 import IconLogo from "assets/icons/IconLogo";
 import EthereumLogo from "assets/icons/ethereum-logo.png";
-import BnbLogo from "assets/icons/bnb-logo.png"; 
+import BnbLogo from "assets/icons/bnb-logo.png";
+import MerlinLogo from "assets/icons/merlinlogo.jpeg";
 
 const Header: React.FC = () => {
   const links = headerLinks;
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [currentNetwork, setCurrentNetwork] = useState("bnb");
+
+  // const handleNetworkChange = async () => {
+  //   if (window.ethereum) {
+  //     try {
+  //       if (currentNetwork === "bnb") {
+  //         await window.ethereum.request({
+  //           method: "wallet_switchEthereumChain",
+  //           params: [{ chainId: "0x1" }], // Ethereum Mainnet
+  //         });
+  //         setCurrentNetwork("eth");
+  //         toast.success("Switched to Ethereum Mainnet");
+  //       } else if (currentNetwork === "eth") {
+  //         await window.ethereum.request({
+  //           method: "wallet_switchEthereumChain",
+  //           params: [{ chainId: "0xA7A7A4" }], // Merlin Testnet (686868 in hex)
+  //         }).catch(async (error: unknown) => {
+  //           if ((error as { code: number }).code === 4902) {
+  //             await window.ethereum.request({
+  //               method: "wallet_addEthereumChain",
+  //               params: [{
+  //                 chainId: "0xA7A7A4", // 686868 in hex
+  //                 chainName: "Merlin Testnet",
+  //                 rpcUrls: ["https://testnet-rpc.merlinchain.io"],
+  //                 nativeCurrency: {
+  //                   name: "Merlin Test Token",
+  //                   symbol: "BTC", 
+  //                   decimals: 18,
+  //                 },
+  //                 blockExplorerUrls: ["https://testnet-scan.merlinchain.io"],
+  //               }],
+  //             });
+  //           } else {
+  //             throw error;
+  //           }
+  //         });
+  //         setCurrentNetwork("merlin");
+  //         toast.success("Switched to Merlin Testnet");
+  //       } else if (currentNetwork === "merlin") {
+  //         await window.ethereum.request({
+  //           method: "wallet_switchEthereumChain",
+  //           params: [{ chainId: "0x61" }], // BNB Smart Chain Testnet
+  //         });
+  //         setCurrentNetwork("bnb");
+  //         toast.success("Switched to BNB Smart Chain Testnet");
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to switch network", error);
+  //       toast.error("Failed to switch network");
+  //     }
+  //   } else {
+  //     alert("MetaMask or compatible wallet not found.");
+  //   }
+  // };
 
   const handleNetworkChange = async () => {
     if (window.ethereum) {
@@ -26,13 +80,20 @@ const Header: React.FC = () => {
           });
           setCurrentNetwork("eth");
           toast.success("Switched to Ethereum Mainnet");
-        } else {
+        } else if (currentNetwork === "eth") {
           await window.ethereum.request({
             method: "wallet_switchEthereumChain",
             params: [{ chainId: "0x61" }], // BNB Smart Chain Testnet
           });
           setCurrentNetwork("bnb");
           toast.success("Switched to BNB Smart Chain Testnet");
+        } else if (currentNetwork === "merlin") {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0xA7F8C" }], // Merlin Testnet (686868 in hexadecimal)
+          });
+          setCurrentNetwork("merlin");
+          toast.success("Switched to Merlin Testnet");
         }
       } catch (error) {
         console.error("Failed to switch network", error);
@@ -42,6 +103,7 @@ const Header: React.FC = () => {
       alert("MetaMask or compatible wallet not found.");
     }
   };
+  
 
   return (
     <div>
@@ -61,18 +123,16 @@ const Header: React.FC = () => {
                   to={link.url}
                   target={!link.url.startsWith("/") ? "_blank" : undefined}
                   key={index}
-                  className={`hover:text-white border-b-2 border-t-2 border-transparent m-transition-color hidden md:flex md:justify-center md:items-center ${
-                    pathname.includes(link.url)
+                  className={`hover:text-white border-b-2 border-t-2 border-transparent m-transition-color hidden md:flex md:justify-center md:items-center ${pathname.includes(link.url)
                       ? " text-white border-b-primary"
                       : "text-light-300"
-                  }`}
+                    }`}
                 >
                   <div
-                    className={`flex gap-10 items-center justify-center py-12 px-25 ${
-                      pathname.includes(link.url)
+                    className={`flex gap-10 items-center justify-center py-12 px-25 ${pathname.includes(link.url)
                         ? "border border-[#FFFFFF66] bg-[#E6E6E61A] rounded-10"
                         : ""
-                    }`}
+                      }`}
                   >
                     <div className="relative w-18 h-18">
                       <link.icon className="w-18 h-18" />
@@ -114,11 +174,15 @@ const Header: React.FC = () => {
               onClick={handleNetworkChange}
               className=""
             >
-              {currentNetwork === "bnb" ? (
-                <img src={BnbLogo} alt="BNB" className="w-36 rounded-full" />
-              ) : (
-                <img src={EthereumLogo} alt="Ethereum" className="w-36 rounded-full" />
-              )}
+              {
+                currentNetwork === "bnb" ? (
+                  <img src={BnbLogo} alt="BNB" className="w-36 rounded-full" />
+                ) : currentNetwork === "eth" ? (
+                  <img src={EthereumLogo} alt="Ethereum" className="w-36 rounded-full" />
+                ) : currentNetwork === "merlin" ? (
+                  <img src={MerlinLogo} alt="Merlin" className="w-36 rounded-full" />
+                ) : null
+              }
             </button>
             <ConnectWalletButton />
           </div>

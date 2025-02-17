@@ -14,12 +14,12 @@ import PoolDetail from "views/Deposit/Pools/PoolDetail";
 import PoolList from "views/Deposit/Pools/PoolList";
 import { useAllPools } from "hooks/contracts/useAllPools";
 import GetTotalTVL from "../ICPfunctions/GetTotalTVL";
-import GetCanisterAddress from "../ICPfunctions/GetCanisterAddress";
-import GetChainID from "../ICPfunctions/GetChainID";
-import AddNewNetwork from "ICPfunctions/AddNetwork";
-import GetOwner from "ICPfunctions/GetOwner";
-import SetOwner from "ICPfunctions/SetOwner";
-import GetNetworks from "ICPfunctions/GetNetwork";
+// import GetCanisterAddress from "../ICPfunctions/GetCanisterAddress";
+// import GetChainID from "../ICPfunctions/GetChainID";
+// import AddNewNetwork from "ICPfunctions/AddNetwork";
+// import GetOwner from "ICPfunctions/GetOwner";
+// import SetOwner from "ICPfunctions/SetOwner";
+// import GetNetworks from "ICPfunctions/GetNetwork";
 
 type IPoolWithDetails = IPool & {
   displayDetails: boolean;
@@ -71,7 +71,7 @@ const DepositPage: React.FC = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    if (!pools) return;
+    if (!pools || poolsData) return; // Add check for existing poolsData
     setPoolsData(
       pools.map((pool: IPool) => ({
         ...pool,
@@ -167,12 +167,12 @@ const DepositPage: React.FC = () => {
         </div>
       </div>
       <div> <GetTotalTVL /> </div>
-      <div> <GetCanisterAddress /> </div>
+      {/* <div> <GetCanisterAddress /> </div>
       <div> <GetChainID /> </div>
       <div> <AddNewNetwork /> </div>
       <div> <GetOwner /> </div>
       <div> <SetOwner /> </div>
-      <div> <GetNetworks /> </div>
+      <div> <GetNetworks /> </div> */}
       {currentDepositType === DepositType.Vault ? (
         <>
           {currentVaultId ? (

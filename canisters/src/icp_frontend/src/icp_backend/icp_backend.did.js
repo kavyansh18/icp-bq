@@ -62,6 +62,20 @@ export const idlFactory = ({ IDL }) => {
       ),
     'setOwner' : IDL.Func([IDL.Principal], [Result_1], []),
     'setPoolContractAddress' : IDL.Func([IDL.Text], [Result_1], []),
+    'updateNetwork' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Nat64,
+          IDL.Text,
+          IDL.Vec(IDL.Text),
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+        ],
+        [Result_1],
+        [],
+      ),
     'vaultwithdraw' : IDL.Func(
         [IDL.Nat64, IDL.Text, IDL.Nat8, IDL.Nat64],
         [Result],
