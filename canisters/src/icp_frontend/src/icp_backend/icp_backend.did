@@ -1,3 +1,9 @@
+type HttpHeader = record { value : text; name : text };
+type HttpResponse = record {
+  status : nat;
+  body : blob;
+  headers : vec HttpHeader;
+};
 type Networks = record {
   vault_contract : text;
   name : text;
@@ -12,6 +18,7 @@ type Result_1 = variant { Ok; Err : text };
 type Result_2 = variant { Ok : nat; Err : text };
 type Result_3 = variant { Ok : Networks; Err : text };
 type Result_4 = variant { Ok : UserDeposit; Err : text };
+type TransformArgs = record { context : blob; response : HttpResponse };
 type UserDeposit = record {
   lp : principal;
   asset : text;
@@ -22,13 +29,6 @@ type UserDeposit = record {
   pool_id : nat;
   daily_payout : nat;
   amount : nat;
-};
-type TransformArgs = record { context : blob; response : HttpResponse };
-type HttpHeader = record { value : text; name : text };
-type HttpResponse = record {
-  status : nat;
-  body : blob;
-  headers : vec HttpHeader;
 };
 service : () -> {
   Poolwithdraw : (nat64, text, nat8, nat64) -> (Result);
@@ -45,9 +45,9 @@ service : () -> {
   getUserPoolDeposit : (nat64, text, nat8, nat64) -> (Result_4) query;
   setOwner : (principal) -> (Result_1);
   setPoolContractAddress : (text) -> (Result_1);
+  transform : (TransformArgs) -> (HttpResponse) query;
   updateNetwork : (text, nat64, text, vec text, text, text, text, text) -> (
       Result_1,
     );
   vaultwithdraw : (nat64, text, nat8, nat64) -> (Result);
-  transform : (TransformArgs) -> (HttpResponse) query;
 }
