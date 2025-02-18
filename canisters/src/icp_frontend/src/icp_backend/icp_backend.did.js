@@ -24,6 +24,16 @@ export const idlFactory = ({ IDL }) => {
     'amount' : IDL.Nat,
   });
   const Result_4 = IDL.Variant({ 'Ok' : UserDeposit, 'Err' : IDL.Text });
+  const HttpHeader = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
+  const HttpResponse = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(HttpHeader),
+  });
+  const TransformArgs = IDL.Record({
+    'context' : IDL.Vec(IDL.Nat8),
+    'response' : HttpResponse,
+  });
   return IDL.Service({
     'Poolwithdraw' : IDL.Func(
         [IDL.Nat64, IDL.Text, IDL.Nat8, IDL.Nat64],
@@ -62,6 +72,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'setOwner' : IDL.Func([IDL.Principal], [Result_1], []),
     'setPoolContractAddress' : IDL.Func([IDL.Text], [Result_1], []),
+    'transform' : IDL.Func([TransformArgs], [HttpResponse], ['query']),
     'updateNetwork' : IDL.Func(
         [
           IDL.Text,

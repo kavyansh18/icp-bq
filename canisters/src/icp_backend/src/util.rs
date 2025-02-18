@@ -4,6 +4,8 @@ use alloy::{
     transports::icp::{RpcApi, RpcService},
 };
 use hex::FromHexError;
+use ic_cdk::api::management_canister::http_request::{HttpResponse, TransformArgs};
+use serde_json::Value;
 
 pub fn to_hex(data: &[u8]) -> String {
     format!("0x{}", hex::encode(data))
@@ -33,4 +35,17 @@ pub fn generate_rpc_service(rpc_url: String) -> RpcService {
         url: rpc_url,
         headers: None,
     })
+}
+
+pub fn transform_http_request(args: TransformArgs) -> HttpResponse {
+    HttpResponse {
+        status: args.response.status,
+        body: canonicalize_json(&args.response.body).unwrap_or(args.response.body),
+        headers: vec![],
+    }
+}
+
+pub fn canonicalize_json(text: &[u8]) -> Option<Vec<u8>> {
+    let json = serde_json::from_slice::<Value>(text).ok()?;
+    serde_json::to_vec(&json).ok()
 }

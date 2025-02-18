@@ -2,6 +2,12 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
+export interface HttpHeader { 'value' : string, 'name' : string }
+export interface HttpResponse {
+  'status' : bigint,
+  'body' : Uint8Array | number[],
+  'headers' : Array<HttpHeader>,
+}
 export interface Networks {
   'vault_contract' : string,
   'name' : string,
@@ -21,6 +27,10 @@ export type Result_3 = { 'Ok' : Networks } |
   { 'Err' : string };
 export type Result_4 = { 'Ok' : UserDeposit } |
   { 'Err' : string };
+export interface TransformArgs {
+  'context' : Uint8Array | number[],
+  'response' : HttpResponse,
+}
 export interface UserDeposit {
   'lp' : Principal,
   'asset' : string,
@@ -51,6 +61,7 @@ export interface _SERVICE {
   >,
   'setOwner' : ActorMethod<[Principal], Result_1>,
   'setPoolContractAddress' : ActorMethod<[string], Result_1>,
+  'transform' : ActorMethod<[TransformArgs], HttpResponse>,
   'updateNetwork' : ActorMethod<
     [string, bigint, string, Array<string>, string, string, string, string],
     Result_1
