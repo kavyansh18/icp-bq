@@ -330,10 +330,17 @@ async fn pool_withdraw(
     };
 
     let signer = create_icp_signer().await;
+    let address = signer.address();
     let wallet = EthereumWallet::from(signer);
+
     let rpc_service = generate_rpc_service(network.rpc_url.clone());
     let config = IcpConfig::new(rpc_service);
-    let provider = ProviderBuilder::new().wallet(wallet).on_icp(config);
+    let provider = ProviderBuilder::new()
+        .with_gas_estimation()
+        .wallet(wallet)
+        .on_icp(config);
+    let nonce = provider.get_transaction_count(address).await.unwrap_or(0);
+    let provider_chain_id = provider.get_chain_id().await.unwrap_or(chain_id);
 
     let pool_contract = InsurancePool::new(pool_contract_address, provider.clone());
     let result = pool_contract
@@ -394,6 +401,9 @@ async fn pool_withdraw(
 
     match pool_contract
         .setUserDepositToZero(U256::from(pool_id), user_address, pdt.into())
+        .nonce(nonce)
+        .chain_id(provider_chain_id)
+        .from(address)
         .send()
         .await
     {
