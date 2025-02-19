@@ -329,9 +329,11 @@ async fn pool_withdraw(
         _ => return Err("Invalid deposit type".to_string()),
     };
 
+    let signer = create_icp_signer().await;
+    let wallet = EthereumWallet::from(signer);
     let rpc_service = generate_rpc_service(network.rpc_url.clone());
     let config = IcpConfig::new(rpc_service);
-    let provider = ProviderBuilder::new().on_icp(config);
+    let provider = ProviderBuilder::new().wallet(wallet).on_icp(config);
 
     let pool_contract = InsurancePool::new(pool_contract_address, provider.clone());
     let result = pool_contract
@@ -390,12 +392,11 @@ async fn pool_withdraw(
         return Err("Must be pool withdrawal".to_string());
     }
 
-    let zero_result = pool_contract
+    match pool_contract
         .setUserDepositToZero(U256::from(pool_id), user_address, pdt.into())
-        .call()
-        .await;
-
-    match zero_result {
+        .send()
+        .await
+    {
         Ok(_) => (),
         Err(e) => return Err(format!("Error setting user deposit to zero: {}", e)),
     }
