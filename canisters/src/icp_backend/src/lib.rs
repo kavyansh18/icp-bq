@@ -335,10 +335,7 @@ async fn pool_withdraw(
 
     let rpc_service = generate_rpc_service(network.rpc_url.clone());
     let config = IcpConfig::new(rpc_service);
-    let provider = ProviderBuilder::new()
-        .with_recommended_fillers()
-        .wallet(wallet)
-        .on_icp(config);
+    let provider = ProviderBuilder::new().wallet(wallet).on_icp(config);
     let nonce = provider.get_transaction_count(address).await.unwrap_or(0);
     let _provider_chain_id = provider.get_chain_id().await.unwrap_or(chain_id);
 
