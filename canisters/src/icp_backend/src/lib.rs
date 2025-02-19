@@ -335,10 +335,7 @@ async fn pool_withdraw(
 
     let rpc_service = generate_rpc_service(network.rpc_url.clone());
     let config = IcpConfig::new(rpc_service);
-    let provider = ProviderBuilder::new()
-        .with_gas_estimation()
-        .wallet(wallet)
-        .on_icp(config);
+    let provider = ProviderBuilder::new().wallet(wallet).on_icp(config);
     let nonce = provider.get_transaction_count(address).await.unwrap_or(0);
     let provider_chain_id = provider.get_chain_id().await.unwrap_or(chain_id);
 
@@ -399,11 +396,18 @@ async fn pool_withdraw(
         return Err("Must be pool withdrawal".to_string());
     }
 
+    let gas_price = match provider.get_gas_price().await {
+        Ok(price) => price,
+        Err(_) => 10000000000,
+    };
+
     match pool_contract
         .setUserDepositToZero(U256::from(pool_id), user_address, pdt.into())
         .nonce(nonce)
         .chain_id(provider_chain_id)
         .from(address)
+        .gas(200000)
+        .gas_price(gas_price)
         .send()
         .await
     {
