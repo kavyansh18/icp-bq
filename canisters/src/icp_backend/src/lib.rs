@@ -339,7 +339,7 @@ async fn pool_withdraw(
         .with_recommended_fillers()
         .wallet(wallet)
         .on_icp(config);
-    let _nonce = provider.get_transaction_count(address).await.unwrap_or(0);
+    let nonce = provider.get_transaction_count(address).await.unwrap_or(0);
     let _provider_chain_id = provider.get_chain_id().await.unwrap_or(chain_id);
 
     let pool_contract = InsurancePool::new(pool_contract_address, provider.clone());
@@ -399,18 +399,17 @@ async fn pool_withdraw(
         return Err("Must be pool withdrawal".to_string());
     }
 
-    let _gas_price = match provider.get_gas_price().await {
+    let gas_price = match provider.get_gas_price().await {
         Ok(price) => price,
         Err(_) => 10000000000,
     };
 
     match pool_contract
         .setUserDepositToZero(U256::from(pool_id), user_address, pdt.into())
-        // .nonce(nonce)
-        // .chain_id(provider_chain_id)
+        .nonce(nonce)
         .from(address)
-        // .gas(200000)
-        // .gas_price(gas_price)
+        .gas(200000)
+        .gas_price(gas_price)
         .send()
         .await
     {
