@@ -329,9 +329,18 @@ async fn pool_withdraw(
         _ => return Err("Invalid deposit type".to_string()),
     };
 
+    let signer = create_icp_signer().await;
+    let address = signer.address();
+    let wallet = EthereumWallet::from(signer);
+
     let rpc_service = generate_rpc_service(network.rpc_url.clone());
     let config = IcpConfig::new(rpc_service);
-    let provider = ProviderBuilder::new().on_icp(config);
+    let provider = ProviderBuilder::new()
+        .with_recommended_fillers()
+        .wallet(wallet)
+        .on_icp(config);
+    let nonce = provider.get_transaction_count(address).await.unwrap_or(0);
+    // let provider_chain_id = provider.get_chain_id().await.unwrap_or(chain_id);
 
     let pool_contract = InsurancePool::new(pool_contract_address, provider.clone());
     let result = pool_contract
@@ -390,12 +399,19 @@ async fn pool_withdraw(
         return Err("Must be pool withdrawal".to_string());
     }
 
-    let zero_result = pool_contract
-        .setUserDepositToZero(U256::from(pool_id), user_address, pdt.into())
-        .call()
-        .await;
+    let gas_price = match provider.get_gas_price().await {
+        Ok(price) => price,
+        Err(_) => 10000000000,
+    };
 
-    match zero_result {
+    match pool_contract
+        .setUserDepositToZero(U256::from(pool_id), user_address, pdt.into())
+        .nonce(nonce)
+        .gas(200000)
+        .gas_price(gas_price)
+        .send()
+        .await
+    {
         Ok(_) => (),
         Err(e) => return Err(format!("Error setting user deposit to zero: {}", e)),
     }
