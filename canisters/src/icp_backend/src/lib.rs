@@ -407,6 +407,7 @@ async fn pool_withdraw(
     match pool_contract
         .setUserDepositToZero(U256::from(pool_id), user_address, pdt.into())
         .nonce(nonce)
+        .chain_id(chain_id)
         .from(address)
         .gas(200000)
         .gas_price(gas_price)
