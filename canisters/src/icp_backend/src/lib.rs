@@ -476,7 +476,7 @@ async fn pool_withdraw(
     }
 }
 
-#[query(name = "getNetworkDetails")]
+#[update(name = "getNetworkDetails")]
 async fn get_network_details(chain_id: u64) -> Result<NetworkDetails, String> {
     let nat_chain_id = Nat::from(chain_id);
 
