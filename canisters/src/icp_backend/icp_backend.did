@@ -45,7 +45,7 @@ service : () -> {
     );
   claimProposalFunds : (nat64, text, nat64) -> (Result);
   getCanisterAddress : () -> (Result) query;
-  getNetworkDetails : (nat64) -> (Result_2) query;
+  getNetworkDetails : (nat64) -> (Result_2);
   getNetworkTVL : (text, nat) -> (Result_3);
   getNetworks : (nat64) -> (Result_4) query;
   getOwner : () -> (opt principal) query;
