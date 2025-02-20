@@ -19,8 +19,8 @@ use std::collections::HashMap;
 use std::time::Duration;
 use std::{cell::RefCell, str::FromStr};
 use types::{
-    EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks, UserDeposit,
-    UserVaultDeposit,
+    EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, NetworkDetails, Networks,
+    UserDeposit, UserVaultDeposit,
 };
 use util::{create_icp_signer, from_hex, generate_rpc_service, to_hex, transform_http_request};
 
@@ -474,6 +474,46 @@ async fn pool_withdraw(
             return Err(format!("Wrong Asset Deposit Type: {}", deposit_detail.adt));
         }
     }
+}
+
+#[query(name = "getNetworkDetails")]
+async fn get_network_details(chain_id: u64) -> Result<NetworkDetails, String> {
+    let nat_chain_id = Nat::from(chain_id);
+
+    let network = STATE.with(|state| {
+        let state = state.borrow();
+
+        let network = match state.supported_networks.get(&nat_chain_id) {
+            Some(network) => network,
+            None => panic!("Network with chain_id {} not found", chain_id),
+        };
+
+        network.clone()
+    });
+
+    let signer = create_icp_signer().await;
+    let address = signer.address();
+    let wallet = EthereumWallet::from(signer);
+
+    let rpc_service = generate_rpc_service(network.rpc_url.clone());
+    let config = IcpConfig::new(rpc_service);
+    let provider = ProviderBuilder::new()
+        .with_recommended_fillers()
+        .wallet(wallet)
+        .on_icp(config);
+    let nonce = provider.get_transaction_count(address).await.unwrap_or(0);
+    let gas_price = provider.get_gas_price().await.unwrap_or(0);
+    let gas = 1000;
+    let provider_chain_id = provider.get_chain_id().await.unwrap_or(0);
+
+    let netdet = NetworkDetails {
+        chain_id: provider_chain_id,
+        nonce,
+        gas,
+        gas_price,
+    };
+
+    Ok(netdet)
 }
 
 #[query(name = "getUserPoolDeposit")]
