@@ -100,18 +100,6 @@ contract Vaults is ReentrancyGuard, Ownable {
         address asset;
     }
 
-    struct Deposits {
-        address lp;
-        uint256 amount;
-        uint256 poolId;
-        uint256 dailyPayout;
-        CoverLib.Status status;
-        uint256 daysLeft;
-        uint256 startDate;
-        uint256 expiryDate;
-        uint256 accruedPayout;
-    }
-
     struct VaultDeposit {
         address lp;
         uint256 amount;
@@ -141,7 +129,7 @@ contract Vaults is ReentrancyGuard, Ownable {
 
     mapping(uint256 => mapping(uint256 => uint256)) vaultPercentageSplits; //vault id to pool id to the pool percentage split;
     mapping(uint256 => Vault) vaults;
-    mapping(address => mapping(uint256 => mapping(CoverLib.DepositType => Deposits))) deposits;
+    mapping(address => mapping(uint256 => mapping(CoverLib.DepositType => CoverLib.Deposits))) deposits;
     mapping(address => mapping(uint256 => VaultDeposit)) userVaultDeposits;
     uint256 public vaultCount;
     address public governance;
@@ -289,7 +277,7 @@ contract Vaults is ReentrancyGuard, Ownable {
             daysLeft: _period,
             startDate: block.timestamp,
             expiryDate: block.timestamp + (_period * 1 seconds),
-            // expiryDate: block.timestamp + (_period * 1 days), change. uncomment for production. 
+            // expiryDate: block.timestamp + (_period * 1 days), change. uncomment for production.
             accruedPayout: 0,
             assetType: vault.assetType,
             asset: vault.asset
@@ -332,9 +320,11 @@ contract Vaults is ReentrancyGuard, Ownable {
     function getUserVaultPoolDeposits(
         uint256 vaultId,
         address user
-    ) public view returns (Deposits[] memory) {
+    ) public view returns (CoverLib.Deposits[] memory) {
         Vault memory vault = vaults[vaultId];
-        Deposits[] memory vaultDeposits = new Deposits[](vault.pools.length);
+        CoverLib.Deposits[] memory vaultDeposits = new CoverLib.Deposits[](
+            vault.pools.length
+        );
         for (uint256 i = 0; i < vault.pools.length; i++) {
             uint256 poolId = vault.pools[i].id;
             vaultDeposits[i] = deposits[user][poolId][
@@ -377,20 +367,14 @@ contract Vaults is ReentrancyGuard, Ownable {
 
     function setCover(address _coverContract) external onlyOwner {
         require(coverContract == address(0), "Cover already set");
-        require(
-            _coverContract != address(0),
-            "Cover address cannot be zero"
-        );
+        require(_coverContract != address(0), "Cover address cannot be zero");
         ICoverContract = ICover(_coverContract);
         coverContract = _coverContract;
     }
 
     function setPool(address _poolcontract) external onlyOwner {
         require(poolContract == address(0), "Pool already set");
-        require(
-            _poolcontract != address(0),
-            "Pool address cannot be zero"
-        );
+        require(_poolcontract != address(0), "Pool address cannot be zero");
         IPoolContract = IPool(_poolcontract);
         poolContract = _poolcontract;
     }
