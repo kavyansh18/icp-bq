@@ -7,7 +7,7 @@
     },
     "icp_frontend": {
       "dependencies": ["icp_backend"],
-      "source": ["src/icp_frontend/dist"],
+      "source": ["src/icp_frontend/build"],
       "type": "assets",
       "candid": "src/icp_frontend/assetstorage.did"
     },

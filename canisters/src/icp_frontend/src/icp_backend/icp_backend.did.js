@@ -1,7 +1,14 @@
 export const idlFactory = ({ IDL }) => {
   const Result = IDL.Variant({ 'Ok' : IDL.Text, 'Err' : IDL.Text });
   const Result_1 = IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text });
-  const Result_2 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : IDL.Text });
+  const NetworkDetails = IDL.Record({
+    'gas' : IDL.Nat,
+    'chain_id' : IDL.Nat64,
+    'nonce' : IDL.Nat64,
+    'gas_price' : IDL.Nat,
+  });
+  const Result_2 = IDL.Variant({ 'Ok' : NetworkDetails, 'Err' : IDL.Text });
+  const Result_3 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : IDL.Text });
   const Networks = IDL.Record({
     'vault_contract' : IDL.Text,
     'name' : IDL.Text,
@@ -11,7 +18,7 @@ export const idlFactory = ({ IDL }) => {
     'rpc_url' : IDL.Text,
     'supported_assets' : IDL.Vec(IDL.Text),
   });
-  const Result_3 = IDL.Variant({ 'Ok' : Networks, 'Err' : IDL.Text });
+  const Result_4 = IDL.Variant({ 'Ok' : Networks, 'Err' : IDL.Text });
   const UserDeposit = IDL.Record({
     'lp' : IDL.Principal,
     'asset' : IDL.Text,
@@ -23,7 +30,7 @@ export const idlFactory = ({ IDL }) => {
     'daily_payout' : IDL.Nat,
     'amount' : IDL.Nat,
   });
-  const Result_4 = IDL.Variant({ 'Ok' : UserDeposit, 'Err' : IDL.Text });
+  const Result_5 = IDL.Variant({ 'Ok' : UserDeposit, 'Err' : IDL.Text });
   const HttpHeader = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
   const HttpResponse = IDL.Record({
     'status' : IDL.Nat,
@@ -61,13 +68,14 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'getCanisterAddress' : IDL.Func([], [Result], ['query']),
-    'getNetworkTVL' : IDL.Func([IDL.Text, IDL.Nat], [Result_2], []),
-    'getNetworks' : IDL.Func([IDL.Nat64], [Result_3], ['query']),
+    'getNetworkDetails' : IDL.Func([IDL.Nat64], [Result_2], []),
+    'getNetworkTVL' : IDL.Func([IDL.Text, IDL.Nat], [Result_3], []),
+    'getNetworks' : IDL.Func([IDL.Nat64], [Result_4], ['query']),
     'getOwner' : IDL.Func([], [IDL.Opt(IDL.Principal)], ['query']),
-    'getTotalTVL' : IDL.Func([], [Result_2], []),
+    'getTotalTVL' : IDL.Func([], [Result_3], []),
     'getUserPoolDeposit' : IDL.Func(
         [IDL.Nat64, IDL.Text, IDL.Nat8, IDL.Nat64],
-        [Result_4],
+        [Result_5],
         ['query'],
       ),
     'setOwner' : IDL.Func([IDL.Principal], [Result_1], []),

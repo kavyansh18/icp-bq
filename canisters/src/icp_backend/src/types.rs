@@ -152,6 +152,14 @@ pub struct Networks {
     pub evm_pool_contract_address: String,
 }
 
+#[derive(Clone, CandidType, Deserialize, Debug)]
+pub struct NetworkDetails {
+    pub chain_id: u64,
+    pub gas_price: u128,
+    pub gas: u128,
+    pub nonce: u64,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct JsonRpcRequest {
     pub id: u64,

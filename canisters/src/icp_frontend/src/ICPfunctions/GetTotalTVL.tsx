@@ -38,7 +38,7 @@ const GetTotalTVL = () => {
     <div className="flex justify-center items-center mt-28">
       <div className="flex flex-row items-center gap-3">
         <span className="font-semibold text-xl bg-gradient-to-r from-teal-200 to-teal-500 bg-clip-text text-transparent">
-          Total TVL locked in the pools: 
+          Total Value Locked: 
         </span>
         <span className="font-bold text-2xl text-white ml-2">
           {statusMessage}
