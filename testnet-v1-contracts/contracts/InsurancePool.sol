@@ -178,6 +178,7 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         newPool.leverage = params.leverage;
         newPool.percentageSplitBalance = 100 - params.investmentArm;
         newPool.assetType = params.adt;
+        newPool.asset = params.asset;
 
         emit PoolCreated(params.poolId, params.poolName);
     }

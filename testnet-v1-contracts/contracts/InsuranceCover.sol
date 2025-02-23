@@ -18,18 +18,6 @@ interface IbqBTC {
 }
 
 interface ILP {
-    struct Deposits {
-        address lp;
-        uint256 amount;
-        uint256 poolId;
-        uint256 dailyPayout;
-        Status status;
-        uint256 daysLeft;
-        uint256 startDate;
-        uint256 expiryDate;
-        uint256 accruedPayout;
-    }
-
     struct Pool {
         uint256 id;
         string poolName;
@@ -58,22 +46,19 @@ interface ILP {
         ERC20
     }
 
-    function getUserDeposit(
+    function getUserPoolDeposit(
         uint256 _poolId,
         address _user
-    ) external view returns (Deposits memory);
+    ) external view returns (CoverLib.Deposits memory);
 
-    function getVaultDeposits(
+    function getUserVaultPoolDeposits(
         uint256 vaultId,
         address user
-    ) external view returns (Deposits[] memory);
+    ) external view returns (CoverLib.Deposits[] memory);
 
     function getPool(
         uint256 _poolId
-    )
-        external
-        view
-        returns (CoverLib.Pool memory);
+    ) external view returns (CoverLib.Pool memory);
 
     function reducePercentageSplit(
         uint256 _poolId,
@@ -173,12 +158,11 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
         uint256 _capacity,
         uint256 _poolId
     ) public onlyOwner {
-        (uint256 _maxAmount, address _asset, CoverLib.AssetDepositType _adt) = _validateAndGetPoolInfo(
-            _coverName,
-            _poolId,
-            _riskType,
-            _capacity
-        );
+        (
+            uint256 _maxAmount,
+            address _asset,
+            CoverLib.AssetDepositType _adt
+        ) = _validateAndGetPoolInfo(_coverName, _poolId, _riskType, _capacity);
 
         lpContract.reducePercentageSplit(_poolId, _capacity);
 
@@ -222,7 +206,9 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
         }
         CoverLib.Pool memory pool = lpContract.getPool(poolId);
 
-        if (pool.riskType != riskType || capacity > pool.percentageSplitBalance) {
+        if (
+            pool.riskType != riskType || capacity > pool.percentageSplitBalance
+        ) {
             revert WrongPool();
         }
 
@@ -241,7 +227,10 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
     ) public onlyOwner {
         CoverLib.Pool memory pool = lpContract.getPool(_poolId);
 
-        if (pool.riskType != _riskType || _capacity > pool.percentageSplitBalance) {
+        if (
+            pool.riskType != _riskType ||
+            _capacity > pool.percentageSplitBalance
+        ) {
             revert WrongPool();
         }
 
@@ -464,11 +453,11 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
     }
 
     function claimPayoutForLP(uint256 _poolId) external nonReentrant {
-        ILP.Deposits memory depositInfo = lpContract.getUserDeposit(
+        CoverLib.Deposits memory depositInfo = lpContract.getUserPoolDeposit(
             _poolId,
             msg.sender
         );
-        if (depositInfo.status != ILP.Status.Active) {
+        if (depositInfo.status != CoverLib.Status.Active) {
             revert LpNotActive();
         }
 
@@ -504,10 +493,8 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
     }
 
     function clamPayoutForVault(uint256 vaultId) external nonReentrant {
-        ILP.Deposits[] memory deposits = lpContract.getVaultDeposits(
-            vaultId,
-            msg.sender
-        );
+        CoverLib.Deposits[] memory deposits = lpContract
+            .getUserVaultPoolDeposits(vaultId, msg.sender);
         uint256 totalClaim;
         uint256 lastClaimTime;
         if (LastVaultClaimTime[msg.sender][vaultId] == 0) {
@@ -523,7 +510,7 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
         uint256 claimableDays = (currentTime - lastClaimTime) / 5 minutes;
 
         for (uint256 i = 0; i < deposits.length; i++) {
-            ILP.Deposits memory deposit = deposits[i];
+            CoverLib.Deposits memory deposit = deposits[i];
             uint256 claimableAmount = deposit.dailyPayout * claimableDays;
             totalClaim += claimableAmount;
         }
@@ -540,7 +527,7 @@ contract InsuranceCover is ReentrancyGuard, Ownable {
         address user,
         uint256 _poolId
     ) public view returns (uint256) {
-        ILP.Deposits memory depositInfo = lpContract.getUserDeposit(
+        CoverLib.Deposits memory depositInfo = lpContract.getUserPoolDeposit(
             _poolId,
             user
         );

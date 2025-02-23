@@ -10,7 +10,8 @@ use alloy::transports::icp::IcpConfig;
 use alloy::{primitives::Address, sol};
 use candid::{CandidType, Deserialize, Nat, Principal};
 use ic_cdk::api::management_canister::http_request::{
-    http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, TransformContext,
+    http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, HttpResponse, TransformArgs,
+    TransformContext,
 };
 use ic_cdk_macros::*;
 use serde::Serialize;
@@ -18,10 +19,10 @@ use std::collections::HashMap;
 use std::time::Duration;
 use std::{cell::RefCell, str::FromStr};
 use types::{
-    EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, Networks, UserDeposit,
-    UserVaultDeposit,
+    EthCallParams, GenericDepositDetail, JsonRpcRequest, JsonRpcResult, NetworkDetails, Networks,
+    UserDeposit, UserVaultDeposit,
 };
-use util::{create_icp_signer, from_hex, generate_rpc_service, to_hex};
+use util::{create_icp_signer, from_hex, generate_rpc_service, to_hex, transform_http_request};
 
 mod types;
 mod util;
@@ -44,6 +45,20 @@ sol! {
     #[sol(rpc)]
     ERC20Token,
     "../../abi/ERC20.json"
+}
+
+sol! {
+    #[allow(missing_docs, clippy::too_many_arguments)]
+    #[sol(rpc)]
+    InsurancePool,
+    "../../abi/InsurancePool.json"
+}
+
+sol! {
+    #[allow(missing_docs, clippy::too_many_arguments)]
+    #[sol(rpc)]
+    VaultContract,
+    "../../abi/Vault.json"
 }
 
 sol! {
@@ -314,59 +329,107 @@ async fn pool_withdraw(
         _ => return Err("Invalid deposit type".to_string()),
     };
 
-    let pool_call = IPool::getUserGenericDepositCall {
-        _poolId: U256::from(pool_id),
-        _user: user_address,
-        pdt: pdt,
+    let signer = create_icp_signer().await;
+    let address = signer.address();
+    let wallet = EthereumWallet::from(signer);
+
+    let rpc_service = generate_rpc_service(network.rpc_url.clone());
+    let config = IcpConfig::new(rpc_service);
+    let provider = ProviderBuilder::new()
+        .with_recommended_fillers()
+        .wallet(wallet)
+        .on_icp(config);
+    let nonce = provider.get_transaction_count(address).await.unwrap_or(0);
+    // let provider_chain_id = provider.get_chain_id().await.unwrap_or(chain_id);
+
+    let pool_contract = InsurancePool::new(pool_contract_address, provider.clone());
+    let result = pool_contract
+        .getUserGenericDeposit(U256::from(pool_id), user_address, pdt.into())
+        .call()
+        .await;
+    let (
+        user,
+        amount,
+        pool_id,
+        daily_payout,
+        status,
+        days_left,
+        start_date,
+        exp_date,
+        accrued_payout,
+        dt,
+        adt,
+        asset,
+    ) = match result {
+        Ok(value) => value._0,
+        Err(e) => return Err(format!("Error fetching user deposit detials: {}", e)),
     };
 
-    let call_data = pool_call.abi_encode();
+    // let pool_call = IPool::getUserGenericDepositCall {
+    //     _poolId: U256::from(pool_id),
+    //     _user: user_address,
+    //     pdt: pdt,
+    // };
 
-    let result =
-        make_json_rpc_request(&pool_contract_address, call_data, network.rpc_url.clone()).await?;
+    // let call_data = pool_call.abi_encode();
 
-    let decoded_result = GenericDepositDetails::abi_decode(&result, false)
-        .map_err(|e| format!("Failed to decode response: {}", e))?;
-    println!("Decoded Result: {:?}", decoded_result);
+    // let result =
+    //     make_json_rpc_request(&pool_contract_address, call_data, network.rpc_url.clone()).await?;
+
+    // let decoded_result = GenericDepositDetails::abi_decode(&result, false)
+    //     .map_err(|e| format!("Failed to decode response: {}", e))?;
+    // println!("Decoded Result: {:?}", decoded_result);
 
     let deposit_detail = GenericDepositDetail {
-        lp: decoded_result.lp,
-        amount: decoded_result.amount,
-        pool_id: decoded_result.poolId,
-        daily_payout: decoded_result.dailyPayout,
-        status: match decoded_result.status {
-            Status::Active => 0,
-            Status::Due => 1,
-            Status::Withdrawn => 2,
-            _ => return Err("Invalid status value".to_string()),
-        },
-        days_left: decoded_result.daysLeft,
-        start_date: decoded_result.startDate,
-        expiry_date: decoded_result.expiryDate,
-        accrued_payout: decoded_result.accruedPayout,
-        pdt: pool_deposit_type,
-        adt: decoded_result.adt.into(),
-        asset: decoded_result.asset,
+        lp: user,
+        amount,
+        pool_id,
+        daily_payout,
+        status,
+        days_left,
+        start_date,
+        expiry_date: exp_date,
+        accrued_payout,
+        pdt: dt,
+        adt,
+        asset,
     };
 
     if pdt != DepositType::Normal {
         return Err("Must be pool withdrawal".to_string());
     }
 
-    let pool_set_call = IPool::setUserDepositToZeroCall {
-        poolId: U256::from(pool_id),
-        user: user_address,
-        pdt: pdt,
+    let gas_price = match provider.get_gas_price().await {
+        Ok(price) => price,
+        Err(_) => 10000000000,
     };
 
-    let set_call_data = pool_set_call.abi_encode();
+    match pool_contract
+        .setUserDepositToZero(U256::from(pool_id), user_address, pdt.into())
+        .nonce(nonce)
+        .gas(200000)
+        .gas_price(gas_price)
+        .send()
+        .await
+    {
+        Ok(_) => (),
+        Err(e) => return Err(format!("Error setting user deposit to zero: {}", e)),
+    }
 
-    let _result = make_json_rpc_request(
-        &pool_contract_address,
-        set_call_data,
-        network.rpc_url.clone(),
-    )
-    .await?;
+    // let pool_set_call = IPool::setUserDepositToZeroCall {
+    //     poolId: U256::from(pool_id),
+    //     user: user_address,
+    //     pdt: pdt,
+    // };
+
+    // let set_call_data = pool_set_call.abi_encode();
+
+    // let _result = make_json_rpc_request(
+    //     &pool_contract_address,
+    //     set_call_data,
+    //     network.rpc_url.clone(),
+    // )
+    // .await?;
 
     let signer = create_icp_signer().await;
     match deposit_detail.adt {
@@ -411,6 +474,46 @@ async fn pool_withdraw(
             return Err(format!("Wrong Asset Deposit Type: {}", deposit_detail.adt));
         }
     }
+}
+
+#[update(name = "getNetworkDetails")]
+async fn get_network_details(chain_id: u64) -> Result<NetworkDetails, String> {
+    let nat_chain_id = Nat::from(chain_id);
+
+    let network = STATE.with(|state| {
+        let state = state.borrow();
+
+        let network = match state.supported_networks.get(&nat_chain_id) {
+            Some(network) => network,
+            None => panic!("Network with chain_id {} not found", chain_id),
+        };
+
+        network.clone()
+    });
+
+    let signer = create_icp_signer().await;
+    let address = signer.address();
+    let wallet = EthereumWallet::from(signer);
+
+    let rpc_service = generate_rpc_service(network.rpc_url.clone());
+    let config = IcpConfig::new(rpc_service);
+    let provider = ProviderBuilder::new()
+        .with_recommended_fillers()
+        .wallet(wallet)
+        .on_icp(config);
+    let nonce = provider.get_transaction_count(address).await.unwrap_or(0);
+    let gas_price = provider.get_gas_price().await.unwrap_or(0);
+    let gas = 1000;
+    let provider_chain_id = provider.get_chain_id().await.unwrap_or(0);
+
+    let netdet = NetworkDetails {
+        chain_id: provider_chain_id,
+        nonce,
+        gas,
+        gas_price,
+    };
+
+    Ok(netdet)
 }
 
 #[query(name = "getUserPoolDeposit")]
@@ -1031,6 +1134,11 @@ async fn make_json_rpc_request(
     )
     .map_err(|e| format!("Failed to parse JSON response: {}", e))?;
 
+    let _json_error = match json.error {
+        Some(error) => return Err(format!("Json RPC error: {}", error.message)),
+        None => (),
+    };
+
     let raw_result = json
         .result
         .ok_or("No result in JSON-RPC response".to_string())?;
@@ -1051,6 +1159,11 @@ fn set_pool_contract(pool_contract: String) -> Result<(), String> {
         state.icp_contract_address = pool_contract;
         Ok(())
     })
+}
+
+#[query]
+fn transform(args: TransformArgs) -> HttpResponse {
+    transform_http_request(args)
 }
 
 ic_cdk::export_candid!();
