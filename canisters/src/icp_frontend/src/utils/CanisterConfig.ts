@@ -3,12 +3,13 @@ import { idlFactory } from '../icp_backend';
 
 const canisterId = 'bkyz2-fmaaa-aaaaa-qaaaq-cai';
 const localHost = "http://127.0.0.1:4943";
-const icHost = "https://icp-api.io"; // Replace with your actual IC host if different
+const icHost = "http://bd3sg-teaaa-aaaaa-qaaba-cai.icp0.app"; 
 
 export const createActor = async () => {
   try {
     console.log("Creating HTTP agent...");
     const host = process.env.VITE_NODE_ENV !== 'production' ? localHost : icHost;
+    // const host = icHost;
     
     const agent = await HttpAgent.create({
       host,

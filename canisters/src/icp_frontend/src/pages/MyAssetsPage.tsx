@@ -61,7 +61,7 @@ const MyAssetsPage = () => {
           setWalletBalance(formattedBalance);
 
           const vaultContractAddress = "0xBda761B689b5b9D05E36f8D5A3A5D9be51aCe6c9";
-          const vaultContract = new ethers.Contract(vaultContractAddress, vaultABI, provider);
+          const vaultContract = new ethers.Contract(vaultContractAddress, vaultABI.abi, provider);
 
           const [vaultDepositsData, poolDetails] = await vaultContract.getUserVaultDeposits(address);
           console.log("Vault Deposits:", vaultDepositsData);

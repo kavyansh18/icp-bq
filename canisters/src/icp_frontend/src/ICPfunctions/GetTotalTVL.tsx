@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { createActor } from "../utils/CanisterConfig";
+import BigNumber from 'bignumber.js';
 
 type Result_2 = { Ok: bigint | number } | { Err: string };
 
 const GetTotalTVL = () => {
   const [statusMessage, setStatusMessage] = useState("Checking connection...");
+  const DECIMALS = 8; // adjust based on your token's decimals
 
   useEffect(() => {
     const testConnection = async () => {
@@ -16,12 +18,19 @@ const GetTotalTVL = () => {
         }
 
         const result = await actor.getTotalTVL() as Result_2;
+        console.log("total tvl", result);
 
         if ("Ok" in result) {
-          const tvlValue = typeof result.Ok === 'bigint' 
-            ? Number(result.Ok) / 1e8 
-            : result.Ok;
-          setStatusMessage(`${tvlValue.toLocaleString()}`);
+          const tvlBN = new BigNumber(result.Ok.toString());
+          
+          // Format with all digits (no division)
+          const fullValue = tvlBN.toFormat();
+          
+          // Format with decimal places
+          const scaledValue = tvlBN.dividedBy(new BigNumber(10).pow(DECIMALS)).toFormat();
+          
+          // Use whichever format you prefer
+          setStatusMessage(fullValue); // or scaledValue
         } else {
           setStatusMessage(`Error: ${result.Err}`);
         }

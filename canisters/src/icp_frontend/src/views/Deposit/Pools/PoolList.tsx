@@ -53,9 +53,9 @@ const PoolList: React.FC<Props> = ({
                       {pool.poolName}
                     </div>
                   </td>
-                  <td className="font-[500] bg-[#1F1F1F] py-24">
+                  {/* <td className="font-[500] bg-[#1F1F1F] py-24">
                     {pool.rating}
-                  </td>
+                  </td> */}
                   <td className="font-[500] bg-[#1F1F1F] py-24">
                     {Number(pool.apy)}%
                   </td>
@@ -104,7 +104,7 @@ const PoolList: React.FC<Props> = ({
                             <div className="flex items-center justify-between w-full">
                               <span className="text-14 font-[400]">TVL</span>
                               <span className="text-14 font-[800]">
-                                {formatEther(pool.tvl || 0n)}
+                                {formatEther(pool.totalUnit || 0n)}
                               </span>
                             </div>
                             {/* <div className="flex items-center justify-between w-full">
