@@ -10,8 +10,12 @@ import IconLogo from "assets/icons/IconLogo";
 // import EthereumLogo from "assets/icons/ethereum-logo.png";
 // import BnbLogo from "assets/icons/bnb-logo.png"; 
 import MerlinLogo from "assets/icons/merlin-logo.jpeg"; 
+import bscLogo from 'assets/icons/bnb-logo.png'
+import { useAccount } from "wagmi";
 
 const Header: React.FC = () => {
+  const { chain } = useAccount();
+  const chainNickname = (chain as any)?.chainNickName || "bscTest";
   const links = headerLinks;
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -121,7 +125,16 @@ const Header: React.FC = () => {
                 <img src={EthereumLogo} alt="Ethereum" className="w-36 rounded-full" />
               )}
             </button> */}
-            <img src={MerlinLogo} alt="BNB" className="w-36 rounded-full" />
+            {/* <img src={MerlinLogo} alt="BNB" className="w-36 rounded-full" /> */}
+            {chainNickname === "merlin" ? (
+        <>
+          <img src={MerlinLogo} className="w-36 rounded-full" alt="network_merlin" />
+        </>
+      ) : (
+        <>
+          <img src={bscLogo} className="w-36 rounded-full" alt="network_bsc" />
+        </>
+      )}
             <ConnectWalletButton />
           </div>
           
