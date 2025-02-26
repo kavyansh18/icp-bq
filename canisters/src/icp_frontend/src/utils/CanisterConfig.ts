@@ -1,15 +1,15 @@
 import { Actor, HttpAgent } from '@dfinity/agent';
 import { idlFactory } from '../icp_backend';
 
-const canisterId = 'bkyz2-fmaaa-aaaaa-qaaaq-cai';
-const localHost = "http://127.0.0.1:4943";
-const icHost = "http://bd3sg-teaaa-aaaaa-qaaba-cai.icp0.app"; 
+const canisterId = 'cdbdu-2qaaa-aaaah-qp6ca-cai';
+// const localHost = "http://127.0.0.1:4943";
+const icHost = "https://ceafa-xiaaa-aaaah-qp6cq-cai.icp0.io/"; 
 
 export const createActor = async () => {
   try {
     console.log("Creating HTTP agent...");
-    const host = process.env.VITE_NODE_ENV !== 'production' ? localHost : icHost;
-    // const host = icHost;
+    // const host = process.env.VITE_NODE_ENV !== 'production' ? localHost : icHost;
+    const host = icHost;
     
     const agent = await HttpAgent.create({
       host,

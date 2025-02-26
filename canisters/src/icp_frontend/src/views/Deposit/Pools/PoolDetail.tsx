@@ -19,6 +19,7 @@ import { useTokenName } from "hooks/contracts/useTokenName";
 import { usePoolDeposit } from "hooks/contracts/usePoolDeposit";
 import { getPoolRiskTypeName } from "lib/utils";
 import Button from "components/common/Button";
+import networkMerlinIcon from "assets/icons/merlin-logo.jpeg";
 
 type Props = {
   poolId: number;
@@ -28,7 +29,7 @@ type Props = {
 const PoolDetail: React.FC<Props> = ({ poolId }) => {
   const { address, chain } = useAccount();
   const poolData = usePoolInfo(poolId);
-  console.log("poolData:", poolData);
+  // console.log("poolData:", poolData);
   const [depositAmount, setDepositAmount] = useState("");
   const [depositPeriod, setDepositPeriod] = useState<number>(
     Number(poolData?.minPeriod) || 0
@@ -37,6 +38,8 @@ const PoolDetail: React.FC<Props> = ({ poolId }) => {
   const [loadingMessage, setLoadingMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { callContractFunction } = useCallContract();
+
+  const chainNickname = (chain as any)?.chainNickName || "bscTest";
 
   const depositADT = useMemo(() => {
     if (!poolData) return undefined;
@@ -95,10 +98,22 @@ const PoolDetail: React.FC<Props> = ({ poolId }) => {
     return parseFloat(balanceData.formatted);
   }, [balanceData]);
 
+  // const assetName = useMemo(() => {
+  //   console.log("assest name",depositADT,ADT.Native)
+  //   if (depositADT === ADT.Native) return "BNB";
+  //   else return assetTokenName || "";
+  // }, [depositADT, assetTokenName]);
+
   const assetName = useMemo(() => {
-    if (depositADT === ADT.Native) return "BNB";
-    else return assetTokenName || "";
-  }, [depositADT, assetTokenName]);
+    if (depositADT === ADT.Native) {
+      console.log("assest name",depositADT,ADT.Native)
+      if (chainNickname === "merlin") return "BTC";
+      if (chainNickname === "bscTest") return "BNB";
+      return "BNB";
+    } else {
+      return assetTokenName || "";
+    }
+  }, [depositADT, assetTokenName, chainNickname]);
 
   const handleDepositPeriodChange = (newVal: number) => {
     setDepositPeriod(newVal);
@@ -106,7 +121,7 @@ const PoolDetail: React.FC<Props> = ({ poolId }) => {
   const approvedTokenAmount = useERC20TokenApprovedTokenAmount(
     assetAddress,
     InsurancePoolContract.addresses[
-      (chain as ChainType)?.chainNickName || "bscTest"
+    (chain as ChainType)?.chainNickName || "bscTest"
     ],
     18
   );
@@ -119,7 +134,7 @@ const PoolDetail: React.FC<Props> = ({ poolId }) => {
         "approve",
         [
           InsurancePoolContract.addresses[
-            (chain as ChainType)?.chainNickName
+          (chain as ChainType)?.chainNickName
           ] as `0x${string}`,
           numberToBN(amount),
         ],
@@ -146,7 +161,7 @@ const PoolDetail: React.FC<Props> = ({ poolId }) => {
     }
   };
 
-  console.log("pool detail:", poolData, approvedTokenAmount);
+  // console.log("pool detail:", poolData, approvedTokenAmount);
   const userPoolDeposit = usePoolDeposit(poolId);
 
   const depositIntoPool = async (
@@ -157,20 +172,20 @@ const PoolDetail: React.FC<Props> = ({ poolId }) => {
     const params = [
       address,
       poolId,
-      parseUnits(depositAmount, 18), 
+      parseUnits(depositAmount, 18),
       poolData?.minPeriod,
       DepositType.Normal,
       assetType,
       __assetAddress,
     ];
 
-    console.log("params:", params);
+    // console.log("params:", params);
 
     try {
       await callContractFunction(
         InsurancePoolContract.abi,
         InsurancePoolContract.addresses[
-          (chain as ChainType)?.chainNickName || "bscTest"
+        (chain as ChainType)?.chainNickName || "bscTest"
         ],
         "deposit",
         [params],
@@ -275,13 +290,18 @@ const PoolDetail: React.FC<Props> = ({ poolId }) => {
             <div className="border border-[#6B7280] rounded-10 bg-[#FFFFFF0D] py-12 px-20">
               APY: {Number(poolData?.apy)}%
             </div>
-            <div className="flex items-center justify-center border border-[#6B7280] rounded-10 bg-[#FFFFFF0D] py-12 px-20">
-              <img
-                src={networkBSCIcon}
-                className="h-24 w-25"
-                alt="network_bob"
-              />
-              <span className="ml-4">Binance Smart Chain</span>
+            <div className="flex items-center gap-4 justify-center border border-[#6B7280] rounded-10 bg-[#FFFFFF0D] py-12 px-20">
+              {chainNickname === "merlin" ? (
+                <>
+                  <img src={networkMerlinIcon} className="h-24 w-25 rounded-full" alt="network_merlin" />
+                  <span className="ml-4">Merlin </span>
+                </>
+              ) : (
+                <>
+                  <img src={networkBSCIcon} className="h-24 w-25 rounded-full" alt="network_bsc" />
+                  <span className="ml-4">Binance Smart Chain</span>
+                </>
+              )}
             </div>
           </div>
         </div>
