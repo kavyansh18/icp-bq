@@ -27,7 +27,7 @@ const GetNetworkTVL = () => {
     },
     {
       name: "BSC Network TVL",
-      rpcUrl: "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
+      rpcUrl: "https://bsc-testnet.publicnode.com",
       chainId: 97,
       nickname: "bscTest"
     }

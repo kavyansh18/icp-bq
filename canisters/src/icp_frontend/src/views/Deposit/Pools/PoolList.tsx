@@ -5,6 +5,8 @@ import { IPool } from "types/common";
 import IconDownIcon from "assets/icons/IconDown";
 import networkBSCIcon from "assets/images/network_bsc.png";
 import { formatEther } from "viem";
+import { useAccount } from "wagmi";
+import merlinLogo from "assets/icons/merlin-logo.jpeg"
 
 type IPoolWithDetails = IPool & {
   displayDetails: boolean;
@@ -23,6 +25,12 @@ const PoolList: React.FC<Props> = ({
   sectionTitle,
   setPoolsData,
 }) => {
+
+  const { chain } = useAccount();
+  const chainNickname = (chain as any)?.chainNickName || "bscTest";
+
+  const networkIcon = chainNickname === "merlin" ? merlinLogo : networkBSCIcon;
+
   return (
     <div className="w-full">
       <div className="mt-80 mb-57">
@@ -84,11 +92,12 @@ const PoolList: React.FC<Props> = ({
                               <span className="text-22 font-[600]">
                                 Network
                               </span>
-                              <img
+                              {/* <img
                                 src={networkBSCIcon}
                                 className="h-24 w-25"
                                 alt="network_bsc"
-                              />
+                              /> */}
+                              <img src={networkIcon} className="h-24 w-25 rounded-full" alt={`network_${chainNickname}`} />
                               {/* <span>{pool.details.network}</span> */}
                             </div>
                           </div>
