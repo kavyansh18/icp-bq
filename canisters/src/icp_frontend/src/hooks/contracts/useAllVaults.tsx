@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { VaultContract } from 'constants/contracts';
 
 import { useAccount, useBlockNumber, useReadContract } from 'wagmi';
-import { ICover, IVault } from 'types/common';
+import { ICover, IVault, IPool } from 'types/common';
 import { ChainType } from 'lib/wagmi';
 
 export const useAllVaults = () => {
@@ -16,9 +16,23 @@ export const useAllVaults = () => {
     args: [],
   });
 
-  // useEffect(() => {
-  //   refetch();
-  // }, [blockNumber]);
+  useEffect(() => {
+    refetch();
+    // console.log("vaults", vaults);
+  
+    // if (vaults) {
+    //   const vaultsArray = vaults as IVault[];
+    //   vaultsArray.forEach((vault, index) => {
+    //     if (vault.pools && vault.pools.length > 0) {
+    //       const totalApy = vault.pools.reduce((sum: number, pool: IPool) => sum + Number(pool.apy), 0);
+    //       const avgApy = totalApy / vault.pools.length;
+    //       console.log(`Average APY for vault ${index}:`, avgApy);
+    //     } else {
+    //       console.log(`No pools found in vault ${index}.`);
+    //     }
+    //   });
+    // }
+  }, [blockNumber]);
 
   if (!vaults) return [];
 
