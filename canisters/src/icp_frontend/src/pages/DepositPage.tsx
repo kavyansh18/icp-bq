@@ -162,7 +162,7 @@ const DepositPage: React.FC = () => {
         </div>
       </div>
 
-      {currentPoolId === undefined ? (
+      {currentPoolId === undefined && currentVaultId === undefined? (
             <div className="mt-20">
               <div> <GetTotalTVL /> </div>
               <div> <GetNetworkTVL /> </div>
