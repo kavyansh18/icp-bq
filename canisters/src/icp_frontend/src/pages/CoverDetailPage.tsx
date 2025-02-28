@@ -40,6 +40,8 @@ const CoverDetailPage: React.FC = () => {
   const { writeContractAsync } = useWriteContract();
   const { callContractFunction } = useCallContract();
 
+  const chainNickname = (chain as any)?.chainNickName || "bscTest";
+
   const coverDetail = useMemo(() => {
     if (availableCovers.length === 0) return undefined;
 
@@ -60,7 +62,11 @@ const CoverDetailPage: React.FC = () => {
   const assetTokenName = useTokenName(coverAssetAddress);
 
   const assetName = useMemo(() => {
-    if (coverADT === ADT.Native) return "BNB";
+    if (coverADT === ADT.Native) {
+      if (chainNickname === "merlin") return "BTC";
+      if (chainNickname === "bscTest") return "BNB";
+      return "BNB";
+    }
     else return assetTokenName || "";
   }, [coverADT, assetTokenName]);
 
