@@ -162,8 +162,14 @@ const DepositPage: React.FC = () => {
         </div>
       </div>
 
-      <div> <GetTotalTVL /> </div>
-      <div> <GetNetworkTVL /> </div>
+      {currentPoolId === undefined ? (
+            <div className="mt-20">
+              <div> <GetTotalTVL /> </div>
+              <div> <GetNetworkTVL /> </div>
+            </div>
+          ) : (
+            <></>
+          )}
       
       {currentDepositType === DepositType.Vault ? (
         <>
