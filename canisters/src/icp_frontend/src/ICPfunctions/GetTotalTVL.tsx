@@ -5,8 +5,10 @@ import BigNumber from 'bignumber.js';
 type Result_2 = { Ok: bigint | number } | { Err: string };
 
 const GetTotalTVL = () => {
-  const [statusMessage, setStatusMessage] = useState("Checking connection...");
-  const DECIMALS = 8; // adjust based on your token's decimals
+  const [loading, setLoading] = useState(true);
+  const [tvlValue, setTvlValue] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const ETH_DECIMALS = 18; //(1 ether = 10^18 wei)
 
   useEffect(() => {
     const testConnection = async () => {
@@ -23,20 +25,20 @@ const GetTotalTVL = () => {
         if ("Ok" in result) {
           const tvlBN = new BigNumber(result.Ok.toString());
           
-          // Format with all digits (no division)
-          const fullValue = tvlBN.toFormat();
+          const etherValue = tvlBN.dividedBy(new BigNumber(10).pow(ETH_DECIMALS));
           
-          // Format with decimal places
-          const scaledValue = tvlBN.dividedBy(new BigNumber(10).pow(DECIMALS)).toFormat();
+          const formattedEther = etherValue.toFormat(6);
           
-          // Use whichever format you prefer
-          setStatusMessage(fullValue); // or scaledValue
+          setTvlValue(`${formattedEther} BTC`);
+          setLoading(false);
         } else {
-          setStatusMessage(`Error: ${result.Err}`);
+          setError(`Error: ${result.Err}`);
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error in useEffect:", error);
-        setStatusMessage("Failed to connect to the canister. Please check your configuration.");
+        setError("Failed to connect to the canister. Please check your configuration.");
+        setLoading(false);
       }
     };
 
@@ -49,9 +51,19 @@ const GetTotalTVL = () => {
         <span className="font-semibold text-xl bg-gradient-to-r from-teal-200 to-teal-500 bg-clip-text text-transparent">
           Total Value Locked: 
         </span>
-        <span className="font-bold text-2xl text-white ml-2">
-          {statusMessage}
-        </span>
+        {loading ? (
+          <div className="ml-2">
+            <div className="h-24 w-24 border-2 border-t-teal-400 border-r-teal-400 border-b-transparent border-l-transparent rounded-full animate-spin ml-4"></div>
+          </div>
+        ) : error ? (
+          <span className="font-bold text-2xl text-red-500 ml-2">
+            {error}
+          </span>
+        ) : (
+          <span className="font-bold text-2xl text-white ml-2">
+            {tvlValue}
+          </span>
+        )}
       </div>
     </div>
   );

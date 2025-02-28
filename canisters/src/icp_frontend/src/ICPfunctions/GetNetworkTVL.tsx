@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAccount } from 'wagmi';
 import { createActor } from "../utils/CanisterConfig";
+import BigNumber from 'bignumber.js';
 
 type Result_3 = { Ok: bigint | number } | { Err: string };
 
@@ -13,10 +14,12 @@ type NetworkTVL = {
 const GetNetworkTVL = () => {
   const { chain } = useAccount();
   const [networkTVL, setNetworkTVL] = useState<NetworkTVL>({
-    value: "Loading...",
+    value: "",
     loading: true,
     error: null
   });
+
+  const ETH_DECIMALS = 18;
 
   const networks = [
     {
@@ -57,8 +60,13 @@ const GetNetworkTVL = () => {
       console.log(`${network.name} TVL Result:`, result);
 
       if ("Ok" in result) {
-        const rawValue = result.Ok.toString();
-        const formattedValue = new Intl.NumberFormat().format(Number(rawValue));
+        // Convert wei to ether
+        const weiValue = new BigNumber(result.Ok.toString());
+        const etherValue = weiValue.dividedBy(new BigNumber(10).pow(ETH_DECIMALS));
+        
+        // Format with 6 decimal places
+        const formattedValue = etherValue.toFormat(6) + " BTC";
+        
         setNetworkTVL({
           value: formattedValue,
           loading: false,
@@ -103,9 +111,15 @@ const GetNetworkTVL = () => {
         <div className="flex flex-row items-center gap-3">
           <span className="font-semibold text-lg bg-gradient-to-r from-teal-200 to-teal-500 bg-clip-text text-transparent">
           </span>
-          <span className="font-bold text-2xl text-white ml-2">
-            {networkTVL.loading ? "Loading..." : networkTVL.value}
-          </span>
+          {networkTVL.loading ? (
+            <div className="flex items-center">
+              <div className="h-20 w-20 my-2 border-2 border-t-teal-400 border-r-teal-400 border-b-transparent border-l-transparent rounded-full animate-spin mr-2"></div>
+            </div>
+          ) : (
+            <span className="font-bold text-2xl text-white ml-2">
+              {networkTVL.value}
+            </span>
+          )}
         </div>
         {networkTVL.error && (
           <p className="text-red-500 mt-2">
