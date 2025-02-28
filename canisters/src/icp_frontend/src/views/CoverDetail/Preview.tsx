@@ -62,13 +62,14 @@ const Preview: React.FC<PreviewProps> = (props) => {
   endDate.setDate((startDate.getDate() + coverPeriod) | 0);
   const { address } = useAccount();
 
-
   const yearlyCost =
     productName && validatorData[productName]
       ? parseFloat(validatorData[productName].yearlyCost.replace(" %", ""))
       : 0;
 
   const coverFees = parseFloat(coverAmount) * (yearlyCost / 100) * (coverPeriod / 365);
+
+  const isCoverFeeTooSmall = coverFees < 0.000001; // Adjust the threshold as needed
 
   return (
     <div className="w-full h-full flex flex-col justify-between">
@@ -147,9 +148,12 @@ const Preview: React.FC<PreviewProps> = (props) => {
               options={['WBTC', 'WETH', 'USDC']}
             /> */}
 
-            <div>{isNaN(coverFees) || coverFees === 0 ? null : (
-              <p className="text-lg font-semibold text-emerald-400">{coverFees}</p>
-            )}
+            <div>
+              {isNaN(coverFees) || coverFees === 0 ? null : isCoverFeeTooSmall ? (
+                <p className="text-[13px] font-semibold text-red-400">Please increase the cover amount or the Tenure Period</p>
+              ) : (
+                <p className="text-lg font-semibold text-emerald-400">{coverFees}</p>
+              )}
             </div>
 
             <div className="ml-10 rounded-6 bg-[#D9D9D933] px-[25px] py-[5px]">{BQBTC.symbol}</div>
@@ -162,7 +166,7 @@ const Preview: React.FC<PreviewProps> = (props) => {
             isLoading={isLoading}
             className="w-fit min-w-302 rounded-8 bg-gradient-to-r from-[#00ECBC66] to-[#00ECBC80] py-16 text-center border border-[#00ECBC]"
             onClick={handleBuyCover}
-            disabled={!!error}
+            disabled={!!error || isCoverFeeTooSmall}
           >
             {error ? error : isLoading ? loadingMessage : "Buy Cover"}
           </Button>
