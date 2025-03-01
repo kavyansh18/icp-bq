@@ -364,6 +364,22 @@ async fn pool_withdraw(
         Ok(value) => value._0,
         Err(e) => return Err(format!("Error fetching user deposit detials: {}", e)),
     };
+
+    // let pool_call = IPool::getUserGenericDepositCall {
+    //     _poolId: U256::from(pool_id),
+    //     _user: user_address,
+    //     pdt: pdt,
+    // };
+
+    // let call_data = pool_call.abi_encode();
+
+    // let result =
+    //     make_json_rpc_request(&pool_contract_address, call_data, network.rpc_url.clone()).await?;
+
+    // let decoded_result = GenericDepositDetails::abi_decode(&result, false)
+    //     .map_err(|e| format!("Failed to decode response: {}", e))?;
+    // println!("Decoded Result: {:?}", decoded_result);
+
     let deposit_detail = GenericDepositDetail {
         lp: user,
         amount,
@@ -399,6 +415,22 @@ async fn pool_withdraw(
         Ok(_) => (),
         Err(e) => return Err(format!("Error setting user deposit to zero: {}", e)),
     }
+
+    // let pool_set_call = IPool::setUserDepositToZeroCall {
+    //     poolId: U256::from(pool_id),
+    //     user: user_address,
+    //     pdt: pdt,
+    // };
+
+    // let set_call_data = pool_set_call.abi_encode();
+
+    // let _result = make_json_rpc_request(
+    //     &pool_contract_address,
+    //     set_call_data,
+    //     network.rpc_url.clone(),
+    // )
+    // .await?;
+
     let signer = create_icp_signer().await;
     match deposit_detail.adt {
         0 => {
