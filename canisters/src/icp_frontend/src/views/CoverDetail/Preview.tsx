@@ -3,7 +3,7 @@ import Button from "components/common/Button";
 import ConnectWalletButton from "components/ConnectWalletButton";
 import { BQBTC } from "constants/config";
 import { formatDate } from "lib/number";
-import React from "react";
+import React, { useMemo } from "react";
 import { useAccount } from "wagmi";
 
 type PreviewProps = {
@@ -60,7 +60,21 @@ const Preview: React.FC<PreviewProps> = (props) => {
   const startDate = new Date();
   const endDate = new Date(startDate);
   endDate.setDate((startDate.getDate() + coverPeriod) | 0);
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
+
+  const chainNickname = (chain as any)?.chainNickName || "bscTest";
+  
+  const displaySymbol = useMemo(() => {
+    const isNativeToken = assetName === "Native";
+    
+    if (isNativeToken) {
+      if (chainNickname === "merlin") return "BTC";
+      if (chainNickname === "bscTest") return "BNB";
+      return "BNB";
+    } else {
+      return assetName || BQBTC.symbol;
+    }
+  }, [assetName, chainNickname]);
 
   const yearlyCost =
     productName && validatorData[productName]
@@ -156,7 +170,7 @@ const Preview: React.FC<PreviewProps> = (props) => {
               )}
             </div>
 
-            <div className="ml-10 rounded-6 bg-[#D9D9D933] px-[25px] py-[5px]">{BQBTC.symbol}</div>
+            <div className="ml-10 rounded-6 bg-[#D9D9D933] px-[25px] py-[5px]">{displaySymbol}</div>
           </div>
         </div>
       </div>

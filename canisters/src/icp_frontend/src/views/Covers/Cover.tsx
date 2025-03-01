@@ -53,6 +53,15 @@ export const Cover: React.FC<CoverProps> = (props) => {
     else return assetTokenName || "";
   }, [adt, assetTokenName]);
 
+  const chainName = useMemo(() => {
+    if (adt === ADT.Native){
+      if (chainNickname === "merlin") return "MERLIN";
+      if (chainNickname === "bscTest") return "BSC";
+      return "BSC";
+    }
+    else return chains || "";
+  }, [adt, chains]);
+
   // const { setSelectedCover } = useContext(CoverContext)!;
   // const router = useRouter();
 
@@ -100,7 +109,7 @@ export const Cover: React.FC<CoverProps> = (props) => {
         ))} */}
           <div className='flex items-center justify-between text-base capitalize leading-[20px]'>
             <div>chains</div>
-            <div className='font-semibold'>{chains}</div>
+            <div className='font-semibold'>{chainName}</div>
           </div>
           <div className='flex items-center justify-between text-base capitalize leading-[20px]'>
             <div>Annual Cost</div>
