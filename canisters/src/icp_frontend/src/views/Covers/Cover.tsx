@@ -51,7 +51,7 @@ export const Cover: React.FC<CoverProps> = (props) => {
       return "BNB";
     }
     else return assetTokenName || "";
-  }, [adt, assetTokenName]);
+  }, [adt, assetTokenName, chainNickname]);
 
   const chainName = useMemo(() => {
     if (adt === ADT.Native){
@@ -60,7 +60,7 @@ export const Cover: React.FC<CoverProps> = (props) => {
       return "BSC";
     }
     else return chains || "";
-  }, [adt, chains]);
+  }, [adt, chains,chainNickname]);
 
   // const { setSelectedCover } = useContext(CoverContext)!;
   // const router = useRouter();
