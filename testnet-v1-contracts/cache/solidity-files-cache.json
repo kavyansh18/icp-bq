@@ -39,13 +39,8 @@
       ]
     },
     "/Users/tosynthegeek/Documents/testnet/testnet-v1-contracts/contracts/Vaults.sol": {
-<<<<<<< HEAD
-      "lastModificationDate": 1739560636846,
-      "contentHash": "c68b135e10e32db83454f30b49f94a7b",
-=======
       "lastModificationDate": 1740228185030,
       "contentHash": "decb8fc7a5abb3266eba2c8653f668f8",
->>>>>>> 86051e43807929df970624e9e3ce7bd3736060dd
       "sourceName": "contracts/Vaults.sol",
       "solcConfig": {
         "version": "0.8.28",
