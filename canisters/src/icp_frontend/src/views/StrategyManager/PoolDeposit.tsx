@@ -103,7 +103,7 @@ const PoolDeposit: React.FC = () => {
         <div className="w-[39%] p-24 bg-[#FFFFFF0D] border border-[#FFFFFF33] rounded-10">
           <div className="flex items-center justify-start gap-20">
             <div className="text-15 font-[600]">Risk Type:</div>
-            <div className="border border-[#00ECBC] bg-[#00ECBC0D] rounded-8 px-24 py-4">
+            <div className="border border-[#4f4f4f] bg-[#00ECBC0D] rounded-8 px-24 py-4">
               Low
             </div>
           </div>

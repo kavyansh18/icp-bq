@@ -1,54 +1,46 @@
-### 1. Start Local Network
-First, start a clean local development network:
+# Getting Started with Create React App
 
-```bash
-dfx start --clean
-```
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-### 2. Create canister
-```bash
-dfx canister create icp_backend  
-```
-```bash
-dfx canister create icp_frontend  
-```
+## Available Scripts
 
-### 3. generate declaration folder
-```bash
-dfx generate  
-```
-replace the new icp_backend folder in the declaration folder with the one in the src folder in frontend folder(used in CanisterConfig.tsx)
+In the project directory, you can run:
 
-### 4. Build canisters
-```bash
- dfx build icp_backend  
-```
-```bash
-dfx build icp_frontend  
-```
+### `npm start`
 
-### 5. Deploy canisters
-```bash
-dfx deploy 
-```
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-### Calling function example
-```bash
-dfx canister call icp_backend addNewNetwork '(                                               
-  "https://testnet-rpc.merlinchain.io",
-  686868 : nat64,
-  "BQ BTC Merlin",
-  vec {
-    "0xD34E6191A859Dcd50842E3E6283C6Ca83828A073";
-    "0x0000000000000000000000000000000000000000"
-  },
-  "0x6742C558D61163D1Dc0eF3BbdF146164B4BE7B90",
-  "0x0000000000000000000000000000000000000000",
-  "0x2e6f6080F7EaB18f67353BCcfA7f9248218Ba457",
-  "0x00b7425D9de87D30bA47370dc56e8086f4c65FF7"
-)'
-```
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
 
-```bash
-dfx canister call icp_backend  getNetworkTVL '("https://testnet-rpc.merlinchain.io", 686868)' 
-```
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).

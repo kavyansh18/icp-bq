@@ -1,3 +1,15 @@
+type HttpHeader = record { value : text; name : text };
+type HttpResponse = record {
+  status : nat;
+  body : blob;
+  headers : vec HttpHeader;
+};
+type NetworkDetails = record {
+  gas : nat;
+  chain_id : nat64;
+  nonce : nat64;
+  gas_price : nat;
+};
 type Networks = record {
   vault_contract : text;
   name : text;
@@ -9,9 +21,11 @@ type Networks = record {
 };
 type Result = variant { Ok : text; Err : text };
 type Result_1 = variant { Ok; Err : text };
-type Result_2 = variant { Ok : nat; Err : text };
-type Result_3 = variant { Ok : Networks; Err : text };
-type Result_4 = variant { Ok : UserDeposit; Err : text };
+type Result_2 = variant { Ok : NetworkDetails; Err : text };
+type Result_3 = variant { Ok : nat; Err : text };
+type Result_4 = variant { Ok : Networks; Err : text };
+type Result_5 = variant { Ok : UserDeposit; Err : text };
+type TransformArgs = record { context : blob; response : HttpResponse };
 type UserDeposit = record {
   lp : principal;
   asset : text;
@@ -31,12 +45,17 @@ service : () -> {
     );
   claimProposalFunds : (nat64, text, nat64) -> (Result);
   getCanisterAddress : () -> (Result) query;
-  getNetworkTVL : (text, nat) -> (Result_2);
-  getNetworks : (nat64) -> (Result_3) query;
+  getNetworkDetails : (nat64) -> (Result_2);
+  getNetworkTVL : (text, nat) -> (Result_3);
+  getNetworks : (nat64) -> (Result_4) query;
   getOwner : () -> (opt principal) query;
-  getTotalTVL : () -> (Result_2);
-  getUserPoolDeposit : (nat64, text, nat8, nat64) -> (Result_4) query;
+  getTotalTVL : () -> (Result_3);
+  getUserPoolDeposit : (nat64, text, nat8, nat64) -> (Result_5) query;
   setOwner : (principal) -> (Result_1);
   setPoolContractAddress : (text) -> (Result_1);
+  transform : (TransformArgs) -> (HttpResponse) query;
+  updateNetwork : (text, nat64, text, vec text, text, text, text, text) -> (
+      Result_1,
+    );
   vaultwithdraw : (nat64, text, nat8, nat64) -> (Result);
 }

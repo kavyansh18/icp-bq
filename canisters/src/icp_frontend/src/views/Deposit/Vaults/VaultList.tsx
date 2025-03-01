@@ -5,6 +5,7 @@ import VaultCard from "./VaultCard";
 import { useAllVaults } from "hooks/contracts/useAllVaults";
 import { scrollToTop } from "lib/utils";
 import { useVaultTVL } from "hooks/contracts/useVaultTVL";
+
 const responsive = {
   superLargeDesktop: {
     // the naming can be any, depends on you.
@@ -37,9 +38,16 @@ const VaultList: React.FC<Props> = ({currentVaultId, setCurrentVaultId}) => {
     <div className="w-full">
       <Carousel responsive={responsive} containerClass="justify-center">
         {vaults.map((vault, index) => {
+          // Calculate average APY
+          let avgApy = 0;
+          if (vault.pools && vault.pools.length > 0) {
+            const totalApy = vault.pools.reduce((sum: number, pool: any) => sum + Number(pool.apy), 0);
+            avgApy = totalApy / vault.pools.length;
+          }
+          
           return (
             <VaultCard
-              apy={Number(vault.apy)}
+              apy={avgApy}
               key={index}
               id={Number(vault.id)}
               name={vault.vaultName || ''}

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { VaultContract } from 'constants/contracts';
 
 import { useAccount, useBlockNumber, useReadContract } from 'wagmi';
-import { ICover, IVault } from 'types/common';
+import { IVault } from 'types/common';
 import { ChainType } from 'lib/wagmi';
 
 export const useVault = (vaultId: number) => {
@@ -16,9 +16,18 @@ export const useVault = (vaultId: number) => {
     args: [vaultId],
   });
 
-  // useEffect(() => {
-  //   refetch();
-  // }, [blockNumber]);
+  useEffect(() => {
+    refetch();
+    console.log('vault by id', vaultData);
+
+    if (vaultData && typeof vaultData === 'object' && 'pools' in vaultData && Array.isArray(vaultData.pools)) {
+      const totalApy = vaultData.pools.reduce((sum, pool) => sum + Number(pool.apy || 0), 0);
+      const avgApy = totalApy / vaultData.pools.length;
+      console.log(`Average APY for vault ${vaultId}:`, avgApy);
+    } else {
+      console.log(`No pools found in vault ${vaultId}.`);
+    }
+  }, [blockNumber]);
 
   if (!vaultData) return undefined;
 

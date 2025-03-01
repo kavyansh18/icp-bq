@@ -5,6 +5,8 @@ import { IPool } from "types/common";
 import IconDownIcon from "assets/icons/IconDown";
 import networkBSCIcon from "assets/images/network_bsc.png";
 import { formatEther } from "viem";
+import { useAccount } from "wagmi";
+import merlinLogo from "assets/icons/merlin-logo.jpeg"
 
 type IPoolWithDetails = IPool & {
   displayDetails: boolean;
@@ -23,6 +25,12 @@ const PoolList: React.FC<Props> = ({
   sectionTitle,
   setPoolsData,
 }) => {
+
+  const { chain } = useAccount();
+  const chainNickname = (chain as any)?.chainNickName || "bscTest";
+
+  const networkIcon = chainNickname === "merlin" ? merlinLogo : networkBSCIcon;
+
   return (
     <div className="w-full">
       <div className="mt-80 mb-57">
@@ -53,9 +61,9 @@ const PoolList: React.FC<Props> = ({
                       {pool.poolName}
                     </div>
                   </td>
-                  <td className="font-[500] bg-[#1F1F1F] py-24">
+                  {/* <td className="font-[500] bg-[#1F1F1F] py-24">
                     {pool.rating}
-                  </td>
+                  </td> */}
                   <td className="font-[500] bg-[#1F1F1F] py-24">
                     {Number(pool.apy)}%
                   </td>
@@ -84,11 +92,12 @@ const PoolList: React.FC<Props> = ({
                               <span className="text-22 font-[600]">
                                 Network
                               </span>
-                              <img
+                              {/* <img
                                 src={networkBSCIcon}
                                 className="h-24 w-25"
                                 alt="network_bsc"
-                              />
+                              /> */}
+                              <img src={networkIcon} className="h-24 w-25 rounded-full" alt={`network_${chainNickname}`} />
                               {/* <span>{pool.details.network}</span> */}
                             </div>
                           </div>
@@ -104,7 +113,7 @@ const PoolList: React.FC<Props> = ({
                             <div className="flex items-center justify-between w-full">
                               <span className="text-14 font-[400]">TVL</span>
                               <span className="text-14 font-[800]">
-                                {formatEther(pool.tvl || 0n)}
+                                {formatEther(pool.totalUnit || 0n)}
                               </span>
                             </div>
                             {/* <div className="flex items-center justify-between w-full">

@@ -7,41 +7,46 @@ import LogoImage from "assets/images/logo.png";
 import ConnectWalletButton from "components/ConnectWalletButton";
 import { cn } from "lib/utils";
 import IconLogo from "assets/icons/IconLogo";
-import EthereumLogo from "assets/icons/ethereum-logo.png";
-import BnbLogo from "assets/icons/bnb-logo.png"; 
+// import EthereumLogo from "assets/icons/ethereum-logo.png";
+// import BnbLogo from "assets/icons/bnb-logo.png"; 
+import MerlinLogo from "assets/icons/merlin-logo.jpeg"; 
+import bscLogo from 'assets/icons/bnb-logo.png'
+import { useAccount } from "wagmi";
 
 const Header: React.FC = () => {
+  const { chain } = useAccount();
+  const chainNickname = (chain as any)?.chainNickName || "bscTest";
   const links = headerLinks;
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [currentNetwork, setCurrentNetwork] = useState("bnb");
 
-  const handleNetworkChange = async () => {
-    if (window.ethereum) {
-      try {
-        if (currentNetwork === "bnb") {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x1" }], // Ethereum Mainnet
-          });
-          setCurrentNetwork("eth");
-          toast.success("Switched to Ethereum Mainnet");
-        } else {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x61" }], // BNB Smart Chain Testnet
-          });
-          setCurrentNetwork("bnb");
-          toast.success("Switched to BNB Smart Chain Testnet");
-        }
-      } catch (error) {
-        console.error("Failed to switch network", error);
-        toast.error("Failed to switch network");
-      }
-    } else {
-      alert("MetaMask or compatible wallet not found.");
-    }
-  };
+  // const handleNetworkChange = async () => {
+  //   if (window.ethereum) {
+  //     try {
+  //       if (currentNetwork === "bnb") {
+  //         await window.ethereum.request({
+  //           method: "wallet_switchEthereumChain",
+  //           params: [{ chainId: "0x1" }], // Ethereum Mainnet
+  //         });
+  //         setCurrentNetwork("eth");
+  //         toast.success("Switched to Ethereum Mainnet");
+  //       } else {
+  //         await window.ethereum.request({
+  //           method: "wallet_switchEthereumChain",
+  //           params: [{ chainId: "0x61" }], // BNB Smart Chain Testnet
+  //         });
+  //         setCurrentNetwork("bnb");
+  //         toast.success("Switched to BNB Smart Chain Testnet");
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to switch network", error);
+  //       toast.error("Failed to switch network");
+  //     }
+  //   } else {
+  //     alert("MetaMask or compatible wallet not found.");
+  //   }
+  // };
 
   return (
     <div>
@@ -110,7 +115,7 @@ const Header: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-10">
-            <button
+            {/* <button
               onClick={handleNetworkChange}
               className=""
             >
@@ -119,9 +124,20 @@ const Header: React.FC = () => {
               ) : (
                 <img src={EthereumLogo} alt="Ethereum" className="w-36 rounded-full" />
               )}
-            </button>
+            </button> */}
+            {/* <img src={MerlinLogo} alt="BNB" className="w-36 rounded-full" /> */}
+            {chainNickname === "merlin" ? (
+        <>
+          <img src={MerlinLogo} className="w-36 rounded-full" alt="network_merlin" />
+        </>
+      ) : (
+        <>
+          <img src={bscLogo} className="w-36 rounded-full" alt="network_bsc" />
+        </>
+      )}
             <ConnectWalletButton />
           </div>
+          
         </div>
       </div>
     </div>

@@ -71,7 +71,7 @@ export interface IPoolInfo {
 export interface IPool {
   id?: bigint | undefined;
   poolName?: string | undefined;
-  rating?: string | undefined;
+  // rating?: string | undefined;
   riskType?: PoolRiskType | undefined;
   apy?: bigint | undefined;
   minPeriod?: bigint | undefined;

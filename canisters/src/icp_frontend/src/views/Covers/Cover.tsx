@@ -1,6 +1,6 @@
 // import { useRouter } from 'next/navigation';
 import React, { useCallback, useContext, useMemo } from 'react';
-
+import { useAccount } from "wagmi";
 import Button from 'components/common/Button';
 
 import { ADT, ICover } from 'types/common';
@@ -41,11 +41,26 @@ export const Cover: React.FC<CoverProps> = (props) => {
   }, [cost]);
   const navigate = useNavigate();
   const assetTokenName = useTokenName(asset);
+  const { chain } = useAccount();
+  const chainNickname = (chain as any)?.chainNickName || "bscTest";
 
   const assetName = useMemo(() => {
-    if (adt === ADT.Native) return "BNB";
+    if (adt === ADT.Native){
+      if (chainNickname === "merlin") return "BTC";
+      if (chainNickname === "bscTest") return "BNB";
+      return "BNB";
+    }
     else return assetTokenName || "";
-  }, [adt, assetTokenName]);
+  }, [adt, assetTokenName, chainNickname]);
+
+  const chainName = useMemo(() => {
+    if (adt === ADT.Native){
+      if (chainNickname === "merlin") return "MERLIN";
+      if (chainNickname === "bscTest") return "BSC";
+      return "BSC";
+    }
+    else return chains || "";
+  }, [adt, chains,chainNickname]);
 
   // const { setSelectedCover } = useContext(CoverContext)!;
   // const router = useRouter();
@@ -94,7 +109,7 @@ export const Cover: React.FC<CoverProps> = (props) => {
         ))} */}
           <div className='flex items-center justify-between text-base capitalize leading-[20px]'>
             <div>chains</div>
-            <div className='font-semibold'>{chains}</div>
+            <div className='font-semibold'>{chainName}</div>
           </div>
           <div className='flex items-center justify-between text-base capitalize leading-[20px]'>
             <div>Annual Cost</div>

@@ -1,5 +1,8 @@
 {
   "icp_backend": {
-    "ic": "lpi4p-cqaaa-aaaal-qsgaa-cai"
+    "ic": "cdbdu-2qaaa-aaaah-qp6ca-cai"
+  },
+  "icp_frontend": {
+    "ic": "ceafa-xiaaa-aaaah-qp6cq-cai"
   }
 }

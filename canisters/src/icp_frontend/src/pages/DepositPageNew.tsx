@@ -14,7 +14,7 @@ import PoolDetail from "views/Deposit/Pools/PoolDetail";
 import PoolList from "views/Deposit/Pools/PoolList";
 import { useAllPools } from "hooks/contracts/useAllPools";
 import GetTotalTVL from "../ICPfunctions/GetTotalTVL";
-import GetNetworkTVL from "../ICPfunctions/GetNetworkTVL"; 
+import GetNetworkTVL from "../ICPfunctions/GetNetworkTVL";
 
 type IPoolWithDetails = IPool & {
   displayDetails: boolean;
@@ -65,15 +65,20 @@ const DepositPage: React.FC = () => {
     setCurrentDepositType(Number(searchParams.get("type")));
   }, [searchParams]);
 
+  // Fix: Stabilize the `pools` dependency using `useMemo`
+  const stablePools = useMemo(() => {
+    if (!pools) return [];
+    return pools;
+  }, [JSON.stringify(pools)]); // compare contents, not reference
+
   useEffect(() => {
-    if (!pools) return;
-    setPoolsData(
-      pools.map((pool: IPool) => ({
-        ...pool,
-        displayDetails: false,
-      }))
-    );
-  }, [pools]);
+    if (!stablePools) return;
+    const newPoolsData = stablePools.map((pool: IPool) => ({
+      ...pool,
+      displayDetails: false,
+    }));
+    setPoolsData(newPoolsData);
+  }, [stablePools]);
 
   return (
     <div className="w-full mx-auto pt-70">
@@ -90,10 +95,6 @@ const DepositPage: React.FC = () => {
               to innovative and secure investment solutions.
             </div>
             <div className="flex items-center justify-center gap-20 mt-45">
-              {/* <ConnectWalletButton className="min-w-[216px] rounded-8 bg-gradient-to-r from-[#00ECBC66] to-[#00ECBC80] border border-[#00ECBC] w-full py-12" />
-          <Button variant="outline" size="lg" className="rounded-8">
-            Read BQ Labs Docs
-          </Button> */}
               <Button
                 variant="outline"
                 size="lg"
@@ -102,7 +103,6 @@ const DepositPage: React.FC = () => {
               >
                 Read BQ Labs Docs
               </Button>
-
             </div>
           </div>
           <div className="my-98 max-w-1220 mx-auto h-1 bg-gradient-to-r from-[#FFFFFF] to-[#161618]"></div>
@@ -143,8 +143,8 @@ const DepositPage: React.FC = () => {
               style={{
                 width: `${100 / types.length}%`,
                 transform: `translateX(${(currentDepositType === undefined ? 0 : currentDepositType) *
-                  100
-                  }%)`,
+                100
+                }%)`,
               }}
             />
             <div
@@ -154,23 +154,17 @@ const DepositPage: React.FC = () => {
               style={{
                 height: `${100 / types.length}%`,
                 transform: `translateY(${(currentDepositType === undefined ? 0 : currentDepositType) *
-                  100
-                  }%)`,
+                100
+                }%)`,
               }}
             />
           </div>
         </div>
       </div>
 
-      {currentPoolId === undefined && currentVaultId === undefined? (
-            <div className="mt-20">
-              <div> <GetTotalTVL /> </div>
-              <div> <GetNetworkTVL /> </div>
-            </div>
-          ) : (
-            <></>
-          )}
-      
+      <div> <GetTotalTVL /> </div>
+      <div> <GetNetworkTVL /> </div>
+
       {currentDepositType === DepositType.Vault ? (
         <>
           {currentVaultId ? (
@@ -216,13 +210,6 @@ const DepositPage: React.FC = () => {
           />
         </div>
       )}
-      {/* {id ? (
-        <div className="mt-50">
-          <StrategyDetail />
-        </div>
-      ) : (
-        <></>
-      )} */}
     </div>
   );
 };

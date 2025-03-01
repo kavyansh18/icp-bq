@@ -61,7 +61,7 @@ const MyAssetsPage = () => {
           setWalletBalance(formattedBalance);
 
           const vaultContractAddress = "0xBda761B689b5b9D05E36f8D5A3A5D9be51aCe6c9";
-          const vaultContract = new ethers.Contract(vaultContractAddress, vaultABI, provider);
+          const vaultContract = new ethers.Contract(vaultContractAddress, vaultABI.abi, provider);
 
           const [vaultDepositsData, poolDetails] = await vaultContract.getUserVaultDeposits(address);
           console.log("Vault Deposits:", vaultDepositsData);
@@ -89,8 +89,8 @@ const MyAssetsPage = () => {
 
   return (
     <div className="w-[80%] mx-auto pt-70">
-      <div className="flex gap-16 bg-black text-white p-6 mb-44">
-        {/* First Card */}
+      {/* <div className="flex gap-16 bg-black text-white p-6 mb-44">
+
         <div className="glass rounded-2xl shadow-lg p-6 w-[80%] px-40 py-32 space-y-56">
           <div className="flex flex-col gap-48 justify-between items-center mb-6 mt-20">
             <div>
@@ -110,7 +110,6 @@ const MyAssetsPage = () => {
           </div>
         </div>
 
-        {/* Second Card */}
         <div className="glass rounded-2xl shadow-xl p-6 w-[80%] px-40 py-32">
           <p className="text-sm text-gray-400 mb-10">Invested Pools</p>
           <div className="flex flex-col gap-4">
@@ -132,7 +131,7 @@ const MyAssetsPage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className="mx-auto w-320">
         <div className="flex w-full cursor-pointer items-center rounded border border-white/10 bg-white/5 p-[3px]">
           <div className="relative flex w-full cursor-pointer flex-col items-center rounded md:flex-row md:gap-0">
