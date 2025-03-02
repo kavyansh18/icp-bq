@@ -22,6 +22,7 @@ import Button from "components/common/Button";
 import { getPoolRiskTypeName } from "lib/utils";
 import bqBTCImg from "assets/images/bqbtc.svg";
 import bnb from "assets/icons/bnb-logo.png";
+import merlinLogo from 'assets/icons/merlin-logo.jpeg';
 
 type Props = {
   id: number;
@@ -36,6 +37,19 @@ const VaultDetail: React.FC<Props> = ({ id }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { callContractFunction } = useCallContract();
   const [avgApy, setAvgApy] = useState<number>(0);
+
+  const chainNickname = (chain as any)?.chainNickName || "bscTest";
+
+  const getAssetLogo = () => {
+    if (assetType === ADT.Native) {
+      if (chainNickname === "merlin") {
+        return merlinLogo;
+      } else if (chainNickname === "bscTest") {
+        return bnb; 
+      }
+    }
+    return bqBTCImg; 
+  };
 
   const vaultData = useVault(id);
   const tvl = useVaultTVL(id);
@@ -89,6 +103,7 @@ const VaultDetail: React.FC<Props> = ({ id }) => {
     const params = [
       Number(id), // vaultId
       parseUnits(amount, 18), // amount
+      vaultData?.minPeriod || 0, // period
     ];
 
     console.log("params:", params);
@@ -290,7 +305,8 @@ const VaultDetail: React.FC<Props> = ({ id }) => {
                 <div className="flex items-center justify-center overflow-hidden rounded-full w-27 h-27">
                   <img
                     className="w-full"
-                    src={assetType === ADT.Native ? bnb : bqBTCImg}
+                    // src={assetType === ADT.Native ? bnb : bqBTCImg}
+                    src={getAssetLogo()}
                     alt=""
                   />
                 </div>
