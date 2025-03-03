@@ -3,7 +3,7 @@ import {
   Navigate,
   Route,
   Routes,
-  BrowserRouter as Router,
+  HashRouter as Router,
 } from "react-router-dom";
 import "./App.css";
 import MainLayout from "./views/MainLayout";
@@ -12,7 +12,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
-    <Router>
+    <Router> 
       <MainLayout>
         <Routes>
           {appRoutes.map((item) => (

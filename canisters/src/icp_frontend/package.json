@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@dfinity/agent": "^2.3.0",
+    "@dfinity/candid": "^2.3.0",
     "@ethersproject/abi": "^5.7.0",
     "@radix-ui/react-slider": "^1.2.1",
     "@rainbow-me/rainbowkit": "2.2.1",
@@ -30,7 +32,7 @@
     "react-minimal-pie-chart": "^9.1.0",
     "react-multi-carousel": "^2.8.5",
     "react-router": "^6.28.0",
-    "react-router-dom": "^6.28.0",
+    "react-router-dom": "^6.30.0",
     "react-scripts": "^5.0.1",
     "react-spinners": "^0.15.0",
     "react-toastify": "^11.0.2",
