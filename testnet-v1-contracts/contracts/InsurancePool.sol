@@ -8,14 +8,8 @@ import "./CoverLib.sol";
 
 interface ICover {
     function updateMaxAmount(uint256 _coverId) external;
-    function getDepositClaimableDays(
-        address user,
-        uint256 _poolId
-    ) external view returns (uint256);
-    function getLastClaimTime(
-        address user,
-        uint256 _poolId
-    ) external view returns (uint256);
+    function getDepositClaimableDays(address user, uint256 _poolId) external view returns (uint256);
+    function getLastClaimTime(address user, uint256 _poolId) external view returns (uint256);
 }
 
 interface IVault {
@@ -63,24 +57,14 @@ interface IVault {
     }
 
     function getVault(uint256 vaultId) external view returns (Vault memory);
-    function getUserVaultDeposit(
-        uint256 vaultId,
-        address user
-    ) external view returns (VaultDeposit memory);
-    function setUserVaultDepositToZero(
-        uint256 vaultId,
-        address user
-    ) external; 
+    function getUserVaultDeposit(uint256 vaultId, address user) external view returns (VaultDeposit memory);
+    function setUserVaultDepositToZero(uint256 vaultId, address user) external;
 }
 
 interface IbqBTC {
     function bqMint(address account, uint256 amount) external;
     function burn(address account, uint256 amount) external;
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
 }
 
 interface IGov {
@@ -114,9 +98,7 @@ interface IGov {
         Rejected
     }
 
-    function getProposalDetails(
-        uint256 _proposalId
-    ) external returns (Proposal memory);
+    function getProposalDetails(uint256 _proposalId) external returns (Proposal memory);
     function updateProposalStatusToClaimed(uint256 proposalId) external;
     function setUserVaultDepositToZero(uint256 vaultId, address user) external;
 }
@@ -154,13 +136,8 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         bqBTCAddress = bq;
     }
 
-    function createPool(
-        CoverLib.PoolParams memory params
-    ) public onlyOwner {
-        require(
-            params.adt == CoverLib.AssetDepositType.Native || params.asset != address(0),
-            "Wrong Asset for Deposit"
-        );
+    function createPool(CoverLib.PoolParams memory params) public onlyOwner {
+        require(params.adt == CoverLib.AssetDepositType.Native || params.asset != address(0), "Wrong Asset for Deposit");
 
         poolCount += 1;
         CoverLib.Pool storage newPool = pools[params.poolId];
@@ -183,11 +160,7 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         emit PoolCreated(params.poolId, params.poolName);
     }
 
-    function updatePool(
-        uint256 _poolId,
-        uint256 _apy,
-        uint256 _minPeriod
-    ) public onlyOwner {
+    function updatePool(uint256 _poolId, uint256 _apy, uint256 _minPeriod) public onlyOwner {
         require(pools[_poolId].isActive, "Pool does not exist or is inactive");
         require(_apy > 0, "Invalid APY");
         require(_minPeriod > 0, "Invalid minimum period");
@@ -198,17 +171,11 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         emit PoolUpdated(_poolId, _apy, _minPeriod);
     }
 
-    function reducePercentageSplit(
-        uint256 _poolId,
-        uint256 __poolPercentageSplit
-    ) public onlyCover {
+    function reducePercentageSplit(uint256 _poolId, uint256 __poolPercentageSplit) public onlyCover {
         pools[_poolId].percentageSplitBalance -= __poolPercentageSplit;
     }
 
-    function increasePercentageSplit(
-        uint256 _poolId,
-        uint256 __poolPercentageSplit
-    ) public onlyCover {
+    function increasePercentageSplit(uint256 _poolId, uint256 __poolPercentageSplit) public onlyCover {
         pools[_poolId].percentageSplitBalance += __poolPercentageSplit;
     }
 
@@ -217,9 +184,7 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         pools[_poolId].isActive = false;
     }
 
-    function getPool(
-        uint256 _poolId
-    ) public view returns (CoverLib.Pool memory) {
+    function getPool(uint256 _poolId) public view returns (CoverLib.Pool memory) {
         return pools[_poolId];
     }
 
@@ -249,11 +214,8 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         return result;
     }
 
-    function updatePoolCovers(
-        uint256 _poolId,
-        CoverLib.Cover memory _cover
-    ) public onlyCover {
-        for (uint i = 0; i < poolToCovers[_poolId].length; i++) {
+    function updatePoolCovers(uint256 _poolId, CoverLib.Cover memory _cover) public onlyCover {
+        for (uint256 i = 0; i < poolToCovers[_poolId].length; i++) {
             if (poolToCovers[_poolId][i].id == _cover.id) {
                 poolToCovers[_poolId][i] = _cover;
                 break;
@@ -261,28 +223,18 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         }
     }
 
-    function addPoolCover(
-        uint256 _poolId,
-        CoverLib.Cover memory _cover
-    ) public onlyCover {
+    function addPoolCover(uint256 _poolId, CoverLib.Cover memory _cover) public onlyCover {
         poolToCovers[_poolId].push(_cover);
     }
 
-    function getPoolCovers(
-        uint256 _poolId
-    ) public view returns (CoverLib.Cover[] memory) {
+    function getPoolCovers(uint256 _poolId) public view returns (CoverLib.Cover[] memory) {
         return poolToCovers[_poolId];
     }
 
-    function getPoolsByAddress(
-        address _userAddress
-    ) public view returns (CoverLib.PoolInfo[] memory) {
+    function getPoolsByAddress(address _userAddress) public view returns (CoverLib.PoolInfo[] memory) {
         uint256 resultCount = 0;
         for (uint256 i = 1; i <= poolCount; i++) {
-            if (
-                deposits[_userAddress][i][CoverLib.DepositType.Normal].amount >
-                0
-            ) {
+            if (deposits[_userAddress][i][CoverLib.DepositType.Normal].amount > 0) {
                 resultCount++;
             }
         }
@@ -293,29 +245,17 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         uint256 resultIndex = 0;
 
         for (uint256 i = 1; i <= poolCount; i++) {
-            if (
-                deposits[_userAddress][i][CoverLib.DepositType.Normal].amount >
-                0
-            ) {
+            if (deposits[_userAddress][i][CoverLib.DepositType.Normal].amount > 0) {
                 require(resultIndex < resultCount, "Index out of bounds");
                 CoverLib.Pool memory pool = pools[i];
-                CoverLib.Deposits memory userDeposit = deposits[_userAddress][i][
-                    CoverLib.DepositType.Normal
-                ];
-                uint256 claimableDays = ICoverContract.getDepositClaimableDays(
-                    _userAddress,
-                    i
-                );
+                CoverLib.Deposits memory userDeposit = deposits[_userAddress][i][CoverLib.DepositType.Normal];
+                uint256 claimableDays = ICoverContract.getDepositClaimableDays(_userAddress, i);
                 uint256 accruedPayout = userDeposit.dailyPayout * claimableDays;
                 result[resultIndex++] = CoverLib.PoolInfo({
                     poolName: pool.poolName,
                     poolId: i,
-                    dailyPayout: deposits[_userAddress][i][
-                        CoverLib.DepositType.Normal
-                    ].dailyPayout,
-                    depositAmount: deposits[_userAddress][i][
-                        CoverLib.DepositType.Normal
-                    ].amount,
+                    dailyPayout: deposits[_userAddress][i][CoverLib.DepositType.Normal].dailyPayout,
+                    depositAmount: deposits[_userAddress][i][CoverLib.DepositType.Normal].amount,
                     apy: pool.apy,
                     minPeriod: pool.minPeriod,
                     totalUnit: pool.totalUnit,
@@ -330,30 +270,23 @@ contract InsurancePool is ReentrancyGuard, Ownable {
 
     function poolWithdraw(uint256 _poolId) public nonReentrant {
         CoverLib.Pool storage selectedPool = pools[_poolId];
-        CoverLib.Deposits storage userDeposit = deposits[msg.sender][_poolId][
-            CoverLib.DepositType.Normal
-        ];
+        CoverLib.Deposits storage userDeposit = deposits[msg.sender][_poolId][CoverLib.DepositType.Normal];
 
         require(userDeposit.amount > 0, "No deposit found for this address");
-        require(
-            userDeposit.status == CoverLib.Status.Active,
-            "Deposit is not active"
-        );
-        require(
-            block.timestamp >= userDeposit.expiryDate,
-            "Deposit period has not ended"
-        );
+        require(userDeposit.status == CoverLib.Status.Active, "Deposit is not active");
+        require(block.timestamp >= userDeposit.expiryDate, "Deposit period has not ended");
 
         userDeposit.status = CoverLib.Status.Withdrawn;
         selectedPool.totalUnit -= userDeposit.amount;
-        uint256 baseValue = selectedPool.totalUnit -
-            ((selectedPool.investmentArmPercent * selectedPool.totalUnit) / 100);
+        selectedPool.tvl -= userDeposit.amount;
+        uint256 baseValue =
+            selectedPool.totalUnit - ((selectedPool.investmentArmPercent * selectedPool.totalUnit) / 100);
 
         uint256 coverUnits = baseValue * selectedPool.leverage;
         selectedPool.coverUnits = coverUnits;
         selectedPool.baseValue = baseValue;
         CoverLib.Cover[] memory poolCovers = getPoolCovers(_poolId);
-        for (uint i = 0; i < poolCovers.length; i++) {
+        for (uint256 i = 0; i < poolCovers.length; i++) {
             ICoverContract.updateMaxAmount(poolCovers[i].id);
         }
 
@@ -373,34 +306,27 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         emit Withdraw(msg.sender, userDeposit.amount, selectedPool.poolName);
     }
 
-    function withdrawUpdate(
-        address depositor,
-        uint256 _poolId,
-        CoverLib.DepositType pdt
-    ) public nonReentrant onlyVault {
+    function withdrawUpdate(address depositor, uint256 _poolId, CoverLib.DepositType pdt)
+        public
+        nonReentrant
+        onlyVault
+    {
         CoverLib.Pool storage selectedPool = pools[_poolId];
         CoverLib.Deposits storage userDeposit = deposits[depositor][_poolId][pdt];
 
         require(userDeposit.amount > 0, "No deposit found for this address");
-        require(
-            userDeposit.status == CoverLib.Status.Active,
-            "Deposit is not active"
-        );
-        require(
-            block.timestamp >= userDeposit.expiryDate,
-            "Deposit period has not ended"
-        );
+        require(userDeposit.status == CoverLib.Status.Active, "Deposit is not active");
+        require(block.timestamp >= userDeposit.expiryDate, "Deposit period has not ended");
 
         userDeposit.status = CoverLib.Status.Due;
         selectedPool.tvl -= userDeposit.amount;
-        uint256 baseValue = selectedPool.tvl -
-            ((selectedPool.investmentArmPercent * selectedPool.tvl) / 100);
+        uint256 baseValue = selectedPool.tvl - ((selectedPool.investmentArmPercent * selectedPool.tvl) / 100);
 
         uint256 coverUnits = baseValue * selectedPool.leverage;
         selectedPool.coverUnits = coverUnits;
         selectedPool.baseValue = baseValue;
         CoverLib.Cover[] memory poolCovers = getPoolCovers(_poolId);
-        for (uint i = 0; i < poolCovers.length; i++) {
+        for (uint256 i = 0; i < poolCovers.length; i++) {
             ICoverContract.updateMaxAmount(poolCovers[i].id);
         }
 
@@ -429,28 +355,20 @@ contract InsurancePool is ReentrancyGuard, Ownable {
     //     IVaultContract.setUserVaultDepositToZero(_vaultId, msg.sender);
     // }
 
-    function deposit(
-        CoverLib.DepositParams memory depositParam
-    ) public payable nonReentrant returns (uint256, uint256) {
+    function deposit(CoverLib.DepositParams memory depositParam)
+        public
+        payable
+        nonReentrant
+        returns (uint256, uint256)
+    {
         CoverLib.Pool storage selectedPool = pools[depositParam.poolId];
 
         require(selectedPool.isActive, "Pool is inactive or does not exist");
+        require(selectedPool.assetType == depositParam.adt, "Pool does not accept this deposit type");
+        require(depositParam.period >= selectedPool.minPeriod, "Period too short");
+        require(selectedPool.asset == depositParam.asset, "Pool does not accept this asset");
         require(
-            selectedPool.assetType == depositParam.adt,
-            "Pool does not accept this deposit type"
-        );
-        require(
-            depositParam.period >= selectedPool.minPeriod,
-            "Period too short"
-        );
-        require(
-            selectedPool.asset == depositParam.asset,
-            "Pool does not accept this asset"
-        );
-        require(
-            deposits[depositParam.depositor][depositParam.poolId][
-                depositParam.pdt
-            ].amount == 0,
+            deposits[depositParam.depositor][depositParam.poolId][depositParam.pdt].amount == 0,
             "User has already deposited into this pool"
         );
 
@@ -458,24 +376,21 @@ contract InsurancePool is ReentrancyGuard, Ownable {
 
         if (selectedPool.assetType == CoverLib.AssetDepositType.ERC20) {
             require(depositParam.amount > 0, "Amount must be greater than 0");
-            IERC20(depositParam.asset).transferFrom(
-                depositParam.depositor,
-                poolCanister,
-                depositParam.amount
-            );
+            IERC20(depositParam.asset).transferFrom(depositParam.depositor, poolCanister, depositParam.amount);
             selectedPool.totalUnit += depositParam.amount;
+            selectedPool.tvl += depositParam.amount;
             price = depositParam.amount;
         } else {
             require(msg.value > 0, "Deposit cannot be zero");
-            (bool sent, ) = payable(poolCanister).call{value: msg.value}("");
+            (bool sent,) = payable(poolCanister).call{value: msg.value}("");
             require(sent, "Failed to send Ether to poolCanister");
 
             selectedPool.totalUnit += msg.value;
+            selectedPool.tvl += depositParam.amount;
             price = msg.value;
         }
 
-        uint256 baseValue = selectedPool.tvl -
-            ((selectedPool.investmentArmPercent * selectedPool.tvl) / 100);
+        uint256 baseValue = selectedPool.tvl - ((selectedPool.investmentArmPercent * selectedPool.tvl) / 100);
 
         uint256 coverUnits = baseValue * selectedPool.leverage;
 
@@ -498,22 +413,18 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         });
 
         if (depositParam.pdt == CoverLib.DepositType.Normal) {
-            deposits[depositParam.depositor][depositParam.poolId][
-                CoverLib.DepositType.Normal
-            ] = userDeposit;
+            deposits[depositParam.depositor][depositParam.poolId][CoverLib.DepositType.Normal] = userDeposit;
         } else {
-            deposits[depositParam.depositor][depositParam.poolId][
-                CoverLib.DepositType.Vault
-            ] = userDeposit;
+            deposits[depositParam.depositor][depositParam.poolId][CoverLib.DepositType.Vault] = userDeposit;
         }
 
         CoverLib.Cover[] memory poolCovers = getPoolCovers(depositParam.poolId);
-        for (uint i = 0; i < poolCovers.length; i++) {
+        for (uint256 i = 0; i < poolCovers.length; i++) {
             ICoverContract.updateMaxAmount(poolCovers[i].id);
         }
 
         bool userExists = false;
-        for (uint i = 0; i < participants.length; i++) {
+        for (uint256 i = 0; i < participants.length; i++) {
             if (participants[i] == depositParam.depositor) {
                 userExists = true;
                 break;
@@ -527,28 +438,20 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         participation[depositParam.depositor] += 1;
         bqBTC.bqMint(depositParam.depositor, price);
 
-        emit Deposited(
-            depositParam.depositor,
-            depositParam.amount,
-            selectedPool.poolName
-        );
+        emit Deposited(depositParam.depositor, depositParam.amount, selectedPool.poolName);
 
         return (price, dailyPayout);
     }
 
     function finalizeProposalClaim(uint256 _proposalId, address user) public nonReentrant onlyPoolCanister {
-        IGov.Proposal memory proposal = IGovernanceContract.getProposalDetails(
-            _proposalId
-        );
+        IGov.Proposal memory proposal = IGovernanceContract.getProposalDetails(_proposalId);
         IGov.ProposalParams memory proposalParam = proposal.proposalParam;
         CoverLib.Pool storage pool = pools[proposalParam.poolId];
 
         pool.tcp += proposalParam.claimAmount;
         pool.tvl -= proposalParam.claimAmount;
-        CoverLib.Cover[] memory poolCovers = getPoolCovers(
-            proposalParam.poolId
-        );
-        for (uint i = 0; i < poolCovers.length; i++) {
+        CoverLib.Cover[] memory poolCovers = getPoolCovers(proposalParam.poolId);
+        for (uint256 i = 0; i < poolCovers.length; i++) {
             ICoverContract.updateMaxAmount(poolCovers[i].id);
         }
 
@@ -557,15 +460,10 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         emit ClaimPaid(user, pool.poolName, proposalParam.claimAmount);
     }
 
-    function getUserPoolDeposit(
-        uint256 _poolId,
-        address _user
-    ) public view returns (CoverLib.Deposits memory) {
-        CoverLib.Deposits memory userDeposit = deposits[_user][_poolId][
-            CoverLib.DepositType.Normal
-        ];
+    function getUserPoolDeposit(uint256 _poolId, address _user) public view returns (CoverLib.Deposits memory) {
+        CoverLib.Deposits memory userDeposit = deposits[_user][_poolId][CoverLib.DepositType.Normal];
         uint256 claimTime = ICoverContract.getLastClaimTime(_user, _poolId);
-        uint lastClaimTime;
+        uint256 lastClaimTime;
         if (claimTime == 0) {
             lastClaimTime = userDeposit.startDate;
         } else {
@@ -586,15 +484,15 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         return userDeposit;
     }
 
-    function getUserGenericDeposit(
-        uint256 _poolId,
-        address _user, 
-        CoverLib.DepositType pdt
-    ) public view returns (CoverLib.GenericDepositDetails memory) {
+    function getUserGenericDeposit(uint256 _poolId, address _user, CoverLib.DepositType pdt)
+        public
+        view
+        returns (CoverLib.GenericDepositDetails memory)
+    {
         CoverLib.Deposits memory userDeposit = deposits[_user][_poolId][pdt];
         CoverLib.Pool memory pool = pools[_poolId];
         uint256 claimTime = ICoverContract.getLastClaimTime(_user, _poolId);
-        uint lastClaimTime;
+        uint256 lastClaimTime;
         if (claimTime == 0) {
             lastClaimTime = userDeposit.startDate;
         } else {
@@ -629,11 +527,11 @@ contract InsurancePool is ReentrancyGuard, Ownable {
         });
     }
 
-    function setUserDepositToZero(
-        uint256 poolId,
-        address user,
-        CoverLib.DepositType pdt
-    ) public nonReentrant onlyPoolCanister {
+    function setUserDepositToZero(uint256 poolId, address user, CoverLib.DepositType pdt)
+        public
+        nonReentrant
+        onlyPoolCanister
+    {
         deposits[user][poolId][pdt].amount = 0;
     }
 
@@ -677,50 +575,32 @@ contract InsurancePool is ReentrancyGuard, Ownable {
 
     function setPoolCanister(address _poolcanister) external onlyOwner {
         require(poolCanister == address(0), "Pool Canister already set");
-        require(
-            _poolcanister != address(0),
-            "Pool Canister address cannot be zero"
-        );
+        require(_poolcanister != address(0), "Pool Canister address cannot be zero");
         poolCanister = _poolcanister;
     }
 
     function updatePoolCanister(address _poolcanister) external onlyOwner {
-        require(
-            _poolcanister != address(0),
-            "Pool Canister address cannot be zero"
-        );
+        require(_poolcanister != address(0), "Pool Canister address cannot be zero");
         poolCanister = _poolcanister;
     }
 
     modifier onlyGovernance() {
-        require(
-            msg.sender == governance || msg.sender == initialOwner,
-            "Caller is not the governance contract"
-        );
+        require(msg.sender == governance || msg.sender == initialOwner, "Caller is not the governance contract");
         _;
     }
 
     modifier onlyCover() {
-        require(
-            msg.sender == coverContract || msg.sender == initialOwner,
-            "Caller is not the cover contract"
-        );
+        require(msg.sender == coverContract || msg.sender == initialOwner, "Caller is not the cover contract");
         _;
     }
 
     modifier onlyVault() {
-        require(
-            msg.sender == vaultContract || msg.sender == initialOwner,
-            "Caller is not the vault contract"
-        );
+        require(msg.sender == vaultContract || msg.sender == initialOwner, "Caller is not the vault contract");
         _;
     }
 
     modifier onlyPoolCanister() {
-        require(
-            msg.sender == poolCanister || msg.sender == initialOwner,
-            "Caller is not the pool canister"
-        );
+        require(msg.sender == poolCanister || msg.sender == initialOwner, "Caller is not the pool canister");
         _;
     }
 }
