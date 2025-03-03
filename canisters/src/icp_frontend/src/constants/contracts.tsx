@@ -34,7 +34,7 @@ export const ICoverContract: ContractType = {
   abi: ICoverABI.abi, 
   addresses: {
     pwr: '0x152C78d6f3D71edc11c11bD3DaD6C042749438b3',
-    merlin: '0x81b467d0466A407F4C9BFd987a4E068Ad12f1f37',
+    merlin: '0x73A2ADA74a26bE449eaD2B130BE070Ca2E0908FE',
     bob: '0x2D25d30945adcDCd2C7E2B16aE4a6372D9b5547e',
     bevm: '0xB69527aa72653A71908e95FA166ba3821BA0B79a',
     rsk: '0xfAB08717d5779DBe49Aa6b547b553593f52744c0',
@@ -48,7 +48,7 @@ export const InsurancePoolContract: ContractType = {
   abi: InsurancePool.abi,
   addresses: {
     pwr: '0x8666c1046f5DD971C0Cf1578291e8A1A413B149f',
-    merlin: '0x37Ee1B98273fE63d7639c1d8873d7B592D7cFa3c',
+    merlin: '0xdedAa296DCab1b5ecFc8A2C9E312b200dcB26581',
     bob: '0x325fEb760bBD9117a0be901FCA79F10D87FDF709',
     bevm: '0x1bc400fe309268A39D3b68093A14257c2c87C531',
     rsk: '0x68543e919B6cd5D884E22Ed85f912daE5De2371b',
@@ -62,7 +62,7 @@ export const BQBTCTokenContract: ContractType = {
   abi: bqBTC,
   addresses: {
     pwr: '0x1A6E4F8F8A0E34E6D74119C2588Cf41560F09757',
-    merlin: '0x9D999387e66429074E9b763e02ce0E036644faFC9',
+    merlin: '0x67120D038bEe1775EB1195313E8e95c1ce33Cc77',
     bob: '0x238E8Be85D7C58E85AFAd4eaB80C69333957359A',
     bevm: '0x0611a6e8D876a9E5D408986deFde849C6A56a465',
     rsk: '0x1EfE902d6aFf44d3C8d245f2d4144db84964a9b4',
@@ -76,7 +76,7 @@ export const VaultContract: ContractType = {
   abi: VaultABI.abi,
   addresses: {
     pwr: '0x8666c1046f5DD971C0Cf1578291e8A1A413B149f',
-    merlin: '0xdD9d2e874E24Cd11586faBE13F86FB4ed65F243A',
+    merlin: '0xc2e8A0B77604A8eba6680b7E2f8c3f2C257319Bd',
     bob: '0x325fEb760bBD9117a0be901FCA79F10D87FDF709',
     bevm: '0x1bc400fe309268A39D3b68093A14257c2c87C531',
     rsk: '0x68543e919B6cd5D884E22Ed85f912daE5De2371b',
